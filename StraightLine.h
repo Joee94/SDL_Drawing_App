@@ -1,21 +1,12 @@
 #pragma once
-#include <SDL.h>
-#include <vector>
-#include <iostream>
-#include "Vec2.h"
+#include "Shape.h"
 
-class StraightLine
+class StraightLine : public Shape
 {
 public:
 	StraightLine();
 	~StraightLine();
 
-	void Point(SDL_Event& mouseEvent, SDL_Renderer* renderer);
+   std::vector<StraightLine*> lines;
 	void Draw(SDL_Renderer* renderer);
-
-	std::vector<StraightLine*> lines;
-
-private:
-	Vec2* point1;
-	Vec2* point2;
 };

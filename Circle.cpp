@@ -12,22 +12,6 @@ Circle::~Circle()
 	delete point2;
 }
 
-void Circle::Point(SDL_Event& mouseEvent, SDL_Renderer* renderer)
-{
-	switch(mouseEvent.type)
-	{
-	case SDL_MOUSEBUTTONDOWN:
-		point1->x = mouseEvent.button.x;
-		point1->y = mouseEvent.button.y;
-		break;
-		
-	case SDL_MOUSEBUTTONUP:
-		point2->x = mouseEvent.button.x;
-      point2->y = mouseEvent.button.y;
-		break;
-	}
-}
-
 void Circle::Draw(SDL_Renderer* renderer)
 {
    int x0 = point1->x;

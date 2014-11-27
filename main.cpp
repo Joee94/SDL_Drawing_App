@@ -96,6 +96,7 @@ int main(int argc, char *argv[])
 
 	bool go = true;
 
+   std::vector<Shape*> shapes;
 
 	std::vector<StraightLine*> lines;
 	std::vector<Rectangle*> rectangles;
@@ -123,6 +124,7 @@ int main(int argc, char *argv[])
 				go = false;
 				break;
 			case SDL_MOUSEBUTTONDOWN:
+            shapes.push_back(new Shape());
 				switch(selector)
 				{
 				case 0:
@@ -131,7 +133,7 @@ int main(int argc, char *argv[])
                break;
 				case 1:
 					rectangles.push_back(new Rectangle());
-               rectangles.back()->Corner(incomingEvent, renderer);
+               rectangles.back()->Point(incomingEvent, renderer);
                break;
 				case 2:
 					circles.push_back(new Circle());
@@ -146,7 +148,7 @@ int main(int argc, char *argv[])
                lines.back()->Point(incomingEvent, renderer);
                break;
 				case 1:				
-               rectangles.back()->Corner(incomingEvent, renderer);
+               rectangles.back()->Point(incomingEvent, renderer);
                break;
 				case 2:				
                circles.back()->Point(incomingEvent, renderer);
@@ -200,6 +202,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
+
 		std::cout << std::endl;
 		// This tells the renderer to actually show its contents to the screen
 		// We'll get into this sort of thing at a later date - or just look up 'double buffering' if you're impatient :P
@@ -217,9 +220,15 @@ int main(int argc, char *argv[])
 	// If we get outside the main game loop, it means our user has requested we exit
 
 
+
 	// Our cleanup phase, hopefully fairly self-explanatory ;)
 	SDL_DestroyWindow( window );
 	SDL_Quit();
 
 	return 0;
+}
+
+void DrawShapes(int test)
+{
+
 }

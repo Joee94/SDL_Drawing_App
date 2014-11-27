@@ -1,21 +1,12 @@
 #pragma once
-#include <SDL.h>
-#include <vector>
-#include <iostream>
-#include "Vec2.h"
+#include "Shape.h"
 
-class Rectangle
+class Rectangle : public Shape
 {
 public:
 	Rectangle();
 	~Rectangle();
 
-	void Corner(SDL_Event& mouseEvent, SDL_Renderer* renderer);
-	void Draw(SDL_Renderer* renderer);
-
-	std::vector<Rectangle*> rectangles;
-
-private:
-	Vec2* corner1;
-	Vec2* corner2;
+   std::vector<Rectangle*> rectangles;
+   void Rectangle::Draw(SDL_Renderer* renderer);
 };
