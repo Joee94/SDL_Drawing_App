@@ -8,7 +8,7 @@ class Shape
 {
 public:
    std::vector<Shape*> shapes;
-   void Point(SDL_Event& mouseEvent, SDL_Renderer* renderer);
+   virtual void Point(SDL_Event& mouseEvent, SDL_Renderer* renderer);
    void Draw(SDL_Renderer* renderer);
 
 protected:
