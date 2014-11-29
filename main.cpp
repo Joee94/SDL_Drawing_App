@@ -7,6 +7,7 @@
 #include "StraightLine.h"
 #include "Rectangle.h"
 #include "Circle.h"
+#include "CurvedLine.h"
 
 
 int main(int argc, char *argv[])
@@ -19,10 +20,10 @@ int main(int argc, char *argv[])
 	// Incidentally, this also initialises the input event system
 	// This function also returns an error value if something goes wrong
 	// So we can put this straight in an 'if' statement to check and exit if need be
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		// Something went very wrong in initialisation, all we can do is exit
-		std::cout<<"Whoops! Something went very wrong, cannot initialise SDL :("<<std::endl;
+		std::cout << "Whoops! Something went very wrong, cannot initialise SDL :(" << std::endl;
 		return -1;
 	}
 
@@ -92,30 +93,32 @@ int main(int argc, char *argv[])
 	//   * Update our world
 	//   * Draw our world
 	// We will come back to this in later lectures
-	
+
 
 	bool go = true;
 
-   std::vector<Shape*> shapes;
+	std::vector<Shape*> shapes;
 
 	std::vector<StraightLine*> lines;
 	std::vector<Rectangle*> rectangles;
 	std::vector<Circle*> circles;
-	
-	int selector = 2;
+	std::vector<CurvedLine*> curvedlines;
 
-	while( go )
+	int selector = 3;
+	int test = 0;
+
+	while (go)
 	{
 		SDL_Event incomingEvent;
 		// SDL_PollEvent will check if there is an event in the queue
 		// If there's nothing in the queue it won't sit and wait around for an event to come along (there are functions which do this, and that can be useful too!)
 		// For an empty queue it will simply return 'false'
 		// If there is an event, the function will return 'true' and it will fill the 'incomingEvent' we have given it as a parameter with the event data
-		while( SDL_PollEvent( &incomingEvent ) )
+		while (SDL_PollEvent(&incomingEvent))
 		{
 			// If we get in here, we have an event and need to figure out what to do with it
 			// For now, we will just use a switch based on the event's type
-			switch( incomingEvent.type )
+			switch (incomingEvent.type)
 			{
 			case SDL_QUIT:
 				// The event type is SDL_QUIT
@@ -124,35 +127,50 @@ int main(int argc, char *argv[])
 				go = false;
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-            shapes.push_back(new Shape());
-				switch(selector)
+				shapes.push_back(new Shape());
+				switch (selector)
 				{
 				case 0:
 					lines.push_back(new StraightLine());
-					lines.back()->Point(incomingEvent, renderer);		
-               break;
+					lines.back()->Point(incomingEvent, renderer);
+					break;
 				case 1:
 					rectangles.push_back(new Rectangle());
-               rectangles.back()->Point(incomingEvent, renderer);
-               break;
+					rectangles.back()->Point(incomingEvent, renderer);
+					break;
 				case 2:
 					circles.push_back(new Circle());
-               circles.back()->Point(incomingEvent, renderer);
-               break;
+					circles.back()->Point(incomingEvent, renderer);
+					break;
+				case 3:
+					std::cout << "point1";
+					curvedlines.push_back(new CurvedLine());
+					curvedlines.back()->Point2(incomingEvent, renderer, 0);
+					break;
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
-				switch(selector)
+				switch (selector)
 				{
 				case 0:
-               lines.back()->Point(incomingEvent, renderer);
-               break;
-				case 1:				
-               rectangles.back()->Point(incomingEvent, renderer);
-               break;
-				case 2:				
-               circles.back()->Point(incomingEvent, renderer);
-               break;
+					lines.back()->Point(incomingEvent, renderer);
+					break;
+				case 1:
+					rectangles.back()->Point(incomingEvent, renderer);
+					break;
+				case 2:
+					circles.back()->Point(incomingEvent, renderer);
+					break;
+				case 3:
+					curvedlines.back()->Point2(incomingEvent, renderer, 1);
+					selector = 4;
+					break;
+				case 4:
+					std::cout << "point3";
+					curvedlines.back()->Point2(incomingEvent, renderer, 2);
+					selector = 3;
+					break;
+
 				}
 				break;
 
@@ -164,55 +182,62 @@ int main(int argc, char *argv[])
 
 
 		unsigned int current = SDL_GetTicks();
-		float deltaTs = (float) (current - lastTime) / 1000.0f;
+		float deltaTs = (float)(current - lastTime) / 1000.0f;
 		// Now that we've done this we can use the current time as the next frame's previous time
 		lastTime = current;
-		
+
 
 		// Start by clearing what was drawn before
 		// Set the colour for drawing
-		SDL_SetRenderDrawColor( renderer, 0x0, 0x0, 0x0, 0xFF );
+		SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0xFF);
 		// Clear the entire screen to our selected colour
-		SDL_RenderClear( renderer );
-		
+		SDL_RenderClear(renderer);
+
 		// Draw our sprite at the given playerPosition!
 		SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-		
-		if(!lines.empty())
+
+		if (!lines.empty())
 		{
-			for(int i=0; i<lines.size(); ++i)
+			for (int i = 0; i < lines.size(); ++i)
 			{
 				lines[i]->Draw(renderer);
 			}
 		}
 
-		if(!rectangles.empty())
+		if (!rectangles.empty())
 		{
-			for(int i=0; i<rectangles.size(); ++i)
+			for (int i = 0; i < rectangles.size(); ++i)
 			{
 				rectangles[i]->Draw(renderer);
 			}
 		}
 
-		if(!circles.empty())
+		if (!circles.empty())
 		{
-			for(int i=0; i<circles.size(); ++i)
+			for (int i = 0; i < circles.size(); ++i)
 			{
 				circles[i]->Draw(renderer);
 			}
 		}
 
+		if (!curvedlines.empty())
+		{
+			for (int i = 0; i < curvedlines.size(); ++i)
+			{
+				curvedlines[i]->Draw(renderer);
+			}
+		}
 
-		std::cout << std::endl;
+
 		// This tells the renderer to actually show its contents to the screen
 		// We'll get into this sort of thing at a later date - or just look up 'double buffering' if you're impatient :P
 		SDL_RenderPresent(renderer);
 
 
 		// Limiter in case we're running really quick
-		if( deltaTs < (1.0f/50.0f) )	// not sure how accurate the SDL_Delay function is..
+		if (deltaTs < (1.0f / 50.0f))	// not sure how accurate the SDL_Delay function is..
 		{
-			SDL_Delay((unsigned int) (((1.0f/50.0f) - deltaTs)*1000.0f) );
+			SDL_Delay((unsigned int)(((1.0f / 50.0f) - deltaTs)*1000.0f));
 		}
 
 		//std::cout << lines.size();
@@ -222,7 +247,7 @@ int main(int argc, char *argv[])
 
 
 	// Our cleanup phase, hopefully fairly self-explanatory ;)
-	SDL_DestroyWindow( window );
+	SDL_DestroyWindow(window);
 	SDL_Quit();
 
 	return 0;

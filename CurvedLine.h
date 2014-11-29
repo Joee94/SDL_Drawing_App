@@ -1,18 +1,22 @@
 #pragma once
 #include "Shape.h"
 
-class CurvedLine : public Shape
+class CurvedLine
 {
 public:
    CurvedLine();
    ~CurvedLine();
 
-   std::vector<CurvedLine*> lines;
+   std::vector<CurvedLine*> curvedlines;
    void Draw(SDL_Renderer* renderer);
+   void Point2(SDL_Event& mouseEvent, SDL_Renderer* renderer, int num);
+   Vec2 CurvedLine::QuadBezierSample2(Vec2 a, Vec2 b, Vec2 control, float t);
 
 private:
-   Vec2* controlPoint;
-   float numSamples = 100.0f;
-
-   Vec2 QuadBezierSample(Vec2 point, float control, float t);
+	Vec2* point1;
+	Vec2* point2;
+	Vec2* controlPoint;
+	int numSamples = 100;
+	
+	float QuadBezierSample(float a, float b, float control, float t);
 };
