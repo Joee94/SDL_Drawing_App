@@ -16,3 +16,7 @@ void Shape::Point(SDL_Event& mouseEvent, SDL_Renderer* renderer)
 
    }
 }
+
+void Shape::Draw(SDL_Renderer* renderer)
+{
+}

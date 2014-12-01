@@ -23,14 +23,15 @@ void CurvedLine::Draw(SDL_Renderer* renderer)
 	float startX = point1->x;
 	float startY = point1->y;
 
-	SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
-	SDL_RenderDrawLine(renderer, (int)point1->x, (int)point1->y, (int)controlPoint->x, (int)controlPoint->y);
-	SDL_RenderDrawLine(renderer, (int)controlPoint->x, (int)controlPoint->y, (int)point2->x, (int)point2->y);
-	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-	SDL_RenderDrawPoint(renderer, controlPoint->x, controlPoint->y);
+	//SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+	//SDL_RenderDrawLine(renderer, (int)point1->x, (int)point1->y, (int)controlPoint->x, (int)controlPoint->y);
+	//SDL_RenderDrawLine(renderer, (int)controlPoint->x, (int)controlPoint->y, (int)point2->x, (int)point2->y);
+	//SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+	//SDL_RenderDrawPoint(renderer, controlPoint->x, controlPoint->y);
 
 
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+#pragma omp parallel for
    for (int i = 1; i < numSamples; ++i)
    {
       float t = (float)i / (float)numSamples;
@@ -45,7 +46,7 @@ void CurvedLine::Draw(SDL_Renderer* renderer)
    SDL_RenderDrawLine(renderer, startX, startY, point2->x, point2->y);
 }
 
-void CurvedLine::Point2(SDL_Event& mouseEvent, SDL_Renderer* renderer, int num)
+void CurvedLine::Point(SDL_Event& mouseEvent, SDL_Renderer* renderer, int num)
 {
 	switch (num)
 	{
@@ -59,7 +60,7 @@ void CurvedLine::Point2(SDL_Event& mouseEvent, SDL_Renderer* renderer, int num)
 		break;
 	case 2:
 		controlPoint->x = mouseEvent.button.x;
-		controlPoint->y = mouseEvent.button.x;
+		controlPoint->y = mouseEvent.button.y;
 		break;
 	}
 }

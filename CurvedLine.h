@@ -1,7 +1,7 @@
 #pragma once
 #include "Shape.h"
 
-class CurvedLine
+class CurvedLine : public Shape
 {
 public:
    CurvedLine();
@@ -9,7 +9,7 @@ public:
 
    std::vector<CurvedLine*> curvedlines;
    void Draw(SDL_Renderer* renderer);
-   void Point2(SDL_Event& mouseEvent, SDL_Renderer* renderer, int num);
+   void Point(SDL_Event& mouseEvent, SDL_Renderer* renderer, int num);
    Vec2 CurvedLine::QuadBezierSample2(Vec2 a, Vec2 b, Vec2 control, float t);
 
 private:

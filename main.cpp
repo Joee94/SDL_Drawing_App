@@ -127,25 +127,28 @@ int main(int argc, char *argv[])
 				go = false;
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				shapes.push_back(new Shape());
 				switch (selector)
 				{
 				case 0:
+					shapes.push_back(new Shape());
 					lines.push_back(new StraightLine());
 					lines.back()->Point(incomingEvent, renderer);
 					break;
 				case 1:
+					shapes.push_back(new Shape());
 					rectangles.push_back(new Rectangle());
 					rectangles.back()->Point(incomingEvent, renderer);
 					break;
 				case 2:
+					shapes.push_back(new Shape());
 					circles.push_back(new Circle());
 					circles.back()->Point(incomingEvent, renderer);
 					break;
 				case 3:
+					shapes.push_back(new Shape());
 					std::cout << "point1";
 					curvedlines.push_back(new CurvedLine());
-					curvedlines.back()->Point2(incomingEvent, renderer, 0);
+					curvedlines.back()->Point(incomingEvent, renderer, 0);
 					break;
 				}
 				break;
@@ -162,18 +165,36 @@ int main(int argc, char *argv[])
 					circles.back()->Point(incomingEvent, renderer);
 					break;
 				case 3:
-					curvedlines.back()->Point2(incomingEvent, renderer, 1);
+					curvedlines.back()->Point(incomingEvent, renderer, 1);
 					selector = 4;
 					break;
 				case 4:
 					std::cout << "point3";
-					curvedlines.back()->Point2(incomingEvent, renderer, 2);
+					curvedlines.back()->Point(incomingEvent, renderer, 2);
 					selector = 3;
 					break;
 
 				}
 				break;
+			case SDL_KEYDOWN:
+				switch (incomingEvent.key.keysym.sym)
+			{
 
+				case SDLK_1:
+					selector = 0;
+					std::cout << "0";
+					break;
+				case SDLK_2:
+					selector = 1;
+					break;
+				case SDLK_3:
+					selector = 2;
+					break;
+				case SDLK_4:
+					selector = 3;
+					break;
+			}
+				 break;
 				// If you want to learn more about event handling and different SDL event types, see:
 				// https://wiki.libsdl.org/SDL_Event
 				// and also: https://wiki.libsdl.org/SDL_EventType
@@ -203,7 +224,7 @@ int main(int argc, char *argv[])
 				lines[i]->Draw(renderer);
 			}
 		}
-
+		
 		if (!rectangles.empty())
 		{
 			for (int i = 0; i < rectangles.size(); ++i)
@@ -211,7 +232,7 @@ int main(int argc, char *argv[])
 				rectangles[i]->Draw(renderer);
 			}
 		}
-
+		
 		if (!circles.empty())
 		{
 			for (int i = 0; i < circles.size(); ++i)
@@ -219,12 +240,20 @@ int main(int argc, char *argv[])
 				circles[i]->Draw(renderer);
 			}
 		}
-
+		
 		if (!curvedlines.empty())
 		{
 			for (int i = 0; i < curvedlines.size(); ++i)
 			{
 				curvedlines[i]->Draw(renderer);
+			}
+		}
+
+		if (!shapes.empty())
+		{
+			for (int i = 0; i < shapes.size(); ++i)
+			{
+				shapes[i]->Draw(renderer);
 			}
 		}
 
