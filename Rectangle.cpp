@@ -21,3 +21,4 @@ void Rectangle::Draw(SDL_Renderer* renderer)
 	SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
 	SDL_RenderDrawRect(renderer, &temp); 
 }
+

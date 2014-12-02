@@ -78,17 +78,16 @@ int main(int argc, char *argv[])
    
       linestream >> x0 >> y0 >> x1 >> y1 >> x2 >> y2; //then just get the rest
       std::cout << type << " " << x0 << " " << y0 << " " << x1 << " " << y1 << " " << x2 << " " << y2 << std::endl;    //debugging mostly
+
+      if (type == "R")
+      {
+         rectangles.push_back(new Rectangle());
+         rectangles.back()->Point(renderer, (x0, y0), (x1, y1));
+      }
+
       types.push_back(type);  //add it to some types array for later
    }
 
-   //This is that "later"
-   //for (uint32_t i = 0; i < types.size(); ++i)
-   //{
-   //   if (types[i] == "L")
-   //   {
-   //
-   //   }
-   //}
 
    saveData.close();
 
@@ -301,6 +300,11 @@ int main(int argc, char *argv[])
       {
          for (int i = 0; i < rectangles.size(); ++i)
          {
+            std::cout << rectangles[i]->GetPoint1().x << " ";
+            std::cout << rectangles[i]->GetPoint1().y << " ";
+            std::cout << rectangles[i]->GetPoint2().x << " ";
+            std::cout << rectangles[i]->GetPoint2().y << " " << std::endl;
+
             fprintf(f, "R\t%f\t%f\t%f\t%f\t%f\t%f\n",
                rectangles[i]->GetPoint1().x,
                rectangles[i]->GetPoint1().y,
