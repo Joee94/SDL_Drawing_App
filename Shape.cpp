@@ -24,3 +24,13 @@ void Shape::Point(SDL_Event& mouseEvent, SDL_Renderer* renderer)
 void Shape::Draw(SDL_Renderer* renderer)
 {
 }
+
+Vec2 Shape::GetPoint1()
+{
+   return (*this->point1);
+}
+
+Vec2 Shape::GetPoint2()
+{
+   return (*this->point2);
+}

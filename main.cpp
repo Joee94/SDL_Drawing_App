@@ -202,9 +202,77 @@ int main(int argc, char *argv[])
          SDL_Delay((unsigned int)(((1.0f / 50.0f) - deltaTs)*1000.0f));
       }
 
-      //std::cout << lines.size();
    }
    // If we get outside the main game loop, it means our user has requested we exit
+
+   //MESSY save stuff down here, all temporary
+   //-----------------------------------------------------------------//
+   //-----------------------------------------------------------------//
+
+   FILE *f;
+   errno_t err;
+   if ((err = fopen_s(&f, "savedata.txt", "w")) != 0)
+   {
+      return 0;
+   }
+   else
+   {
+      if (!lines.empty())
+      {
+         for (int i = 0; i < lines.size(); ++i)
+         {
+            fprintf(f, "L %f %f %f %f \n",
+               lines[i]->GetPoint1().x,
+               lines[i]->GetPoint1().y,
+               lines[i]->GetPoint2().x,
+               lines[i]->GetPoint2().y);
+         }
+      }
+
+
+      if (!rectangles.empty())
+      {
+         for (int i = 0; i < rectangles.size(); ++i)
+         {
+            fprintf(f, "R %f %f %f %f \n",
+               rectangles[i]->GetPoint1().x,
+               rectangles[i]->GetPoint1().y,
+               rectangles[i]->GetPoint2().x,
+               rectangles[i]->GetPoint2().y);
+         }
+      }
+
+      if (!circles.empty())
+      {
+         for (int i = 0; i < circles.size(); ++i)
+         {
+            fprintf(f, "C %f %f %f %f \n",
+               circles[i]->GetPoint1().x,
+               circles[i]->GetPoint1().y,
+               circles[i]->GetPoint2().x,
+               circles[i]->GetPoint2().y);
+         }
+      }
+
+      if (!curvedlines.empty())
+      {
+         for (int i = 0; i < curvedlines.size(); ++i)
+         {
+            fprintf(f, "CL %f %f %f %f %f %f\n",
+               curvedlines[i]->GetPoint1().x,
+               curvedlines[i]->GetPoint1().y,
+               curvedlines[i]->GetPoint2().x,
+               curvedlines[i]->GetPoint2().y,
+               curvedlines[i]->GetControlPoint().x,
+               curvedlines[i]->GetControlPoint().y);
+         }
+      }
+
+      fclose(f);
+   }
+
+   //-----------------------------------------------------------------//
+   //-----------------------------------------------------------------//
 
    // Our cleanup phase, hopefully fairly self-explanatory ;)
    SDL_DestroyWindow(window);

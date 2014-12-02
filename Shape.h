@@ -13,6 +13,9 @@ public:
    virtual void Point(SDL_Event& mouseEvent, SDL_Renderer* renderer);   //Virtual so I can overwrite them when I need to
    virtual void Draw(SDL_Renderer* renderer);
 
+   Vec2 GetPoint1();
+   Vec2 GetPoint2();
+
 protected:
    Vec2* point1;  //My base 2 points which all shapes have however some may have more points
    Vec2* point2;

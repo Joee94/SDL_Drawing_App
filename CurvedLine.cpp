@@ -86,3 +86,8 @@ Vec2 CurvedLine::QuadBezierSample2(Vec2 a, Vec2 b, Vec2 control, float t)
    //Magic...
 	return ((1.0f - t)*(1.0f - t)*a) + (2.0f*(1.0f - t)*t*control) + (t*t*b);
 }
+
+Vec2 CurvedLine::GetControlPoint()
+{
+   return (*this->controlPoint);
+}
