@@ -21,12 +21,12 @@ void Shape::Point(SDL_Event& mouseEvent, SDL_Renderer* renderer)
    }
 }
 
-void Shape::Point(SDL_Renderer* renderer, Vec2 p1, Vec2 p2)
+void Shape::Point(SDL_Renderer* renderer, float p1x, float p1y, float p2x, float p2y)
 {
-   point1->x = p1.x;
-   point1->y = p1.y;
-   point2->x = p2.x;
-   point2->y = p2.y;
+   point1->x = p1x;
+   point1->y = p1y;
+   point2->x = p2x;
+   point2->y = p2y;
 }
 
 void Shape::Draw(SDL_Renderer* renderer)

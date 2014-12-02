@@ -79,10 +79,15 @@ int main(int argc, char *argv[])
       linestream >> x0 >> y0 >> x1 >> y1 >> x2 >> y2; //then just get the rest
       std::cout << type << " " << x0 << " " << y0 << " " << x1 << " " << y1 << " " << x2 << " " << y2 << std::endl;    //debugging mostly
 
+      if (type == "L")
+      {
+         lines.push_back(new StraightLine());
+         lines.back()->Point(renderer, x0, y0, x1, y1);
+      }
       if (type == "R")
       {
          rectangles.push_back(new Rectangle());
-         rectangles.back()->Point(renderer, (x0, y0), (x1, y1));
+         rectangles.back()->Point(renderer, x0, y0, x1, y1);
       }
 
       types.push_back(type);  //add it to some types array for later
