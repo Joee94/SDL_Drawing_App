@@ -2,37 +2,46 @@
 
 Circle::Circle()
 {
+   //Creating the points
 	point1 = new Vec2();
 	point2 = new Vec2();
 }
 
 Circle::~Circle()
 {
+   //Deleting the points
 	delete point1;
 	delete point2;
 }
 
 void Circle::Draw(SDL_Renderer* renderer)
 {
-   int x0 = point1->x;
+   //Ok I'm not 100% sure how this works, circles are complicated
+
+   int x0 = point1->x;  //assign my point1 co-ordinates to x0 and y0
    int y0 = point1->y;
-   int radiusx = fabs(point2->x - point1->x);
-   int radiusy = fabs(point2->y - point1->y);
+   int radiusx = fabs(point2->x - point1->x);   //find the radius, for some reason length doesn't work or something... idk
+   int radiusy = fabs(point2->y - point1->y);   //I HATE this piece of code it's so terribly innefficient
    radius = sqrt((radiusx*radiusx) + (radiusy*radiusy));
-   int x = radius;
-   int y = 0;
+   //radius = length(point1 - point2);    //Why doesn't this work.... WHYYY
+   int x = radius;   //set x as the radius
+   int y = 0;  //set y as the center point (I think)
    radiusError = 1 - x;
 
-   std::cout << point1->x << std::endl;
+   #ifdef _DEBUG
+   std::cout << point1->x << std::endl;   //Debugging stuff
    std::cout << point1->y << std::endl;
    std::cout << point2->x << std::endl;
    std::cout << point2->y << std::endl;
    std::cout << radius << std::endl;
    std::cout << std::endl;
+   #endif
 
+   SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
    #pragma omp parallel for
    for (y = 0; x >= y; y++)
    {
+      //Yeah I'm not gunna lie I'm not sure what's going on here... just drawing a buncha points
       SDL_RenderDrawPoint(renderer, x + x0, y + y0);		//Completely and utterly stolen from http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
       SDL_RenderDrawPoint(renderer, y + x0, x + y0);
       SDL_RenderDrawPoint(renderer, -x + x0, y + y0);
@@ -53,5 +62,4 @@ void Circle::Draw(SDL_Renderer* renderer)
       }
    }
 
-	SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
 }

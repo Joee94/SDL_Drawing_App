@@ -1,6 +1,6 @@
 #pragma once
 #include <cmath>
-
+//This was stolen from rob -- sorry it just has everything
 /// declares a type called 'Vec2' that represents a 2D vector
 struct Vec2 
 {
