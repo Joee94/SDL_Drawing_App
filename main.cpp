@@ -89,6 +89,16 @@ int main(int argc, char *argv[])
          rectangles.push_back(new Rectangle());
          rectangles.back()->Point(renderer, x0, y0, x1, y1);
       }
+      if (type == "C")
+      {
+         circles.push_back(new Circle());
+         circles.back()->Point(renderer, x0, y0, x1, y1);
+      }
+      if (type == "CL")
+      {
+         curvedlines.push_back(new CurvedLine());
+         curvedlines.back()->Point(renderer, x0, y0, x1, y1, x2, y2);
+      }
 
       types.push_back(type);  //add it to some types array for later
    }

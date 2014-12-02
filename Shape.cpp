@@ -29,6 +29,7 @@ void Shape::Point(SDL_Renderer* renderer, float p1x, float p1y, float p2x, float
    point2->y = p2y;
 }
 
+
 void Shape::Draw(SDL_Renderer* renderer)
 {
 }

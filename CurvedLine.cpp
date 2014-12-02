@@ -87,6 +87,16 @@ Vec2 CurvedLine::QuadBezierSample2(Vec2 a, Vec2 b, Vec2 control, float t)
 	return ((1.0f - t)*(1.0f - t)*a) + (2.0f*(1.0f - t)*t*control) + (t*t*b);
 }
 
+void CurvedLine::Point(SDL_Renderer* renderer, float p1x, float p1y, float p2x, float p2y, float p3x, float p3y)
+{
+   point1->x = p1x;
+   point1->y = p1y;
+   point2->x = p2x;
+   point2->y = p2y;
+   controlPoint->x = p3x;
+   controlPoint->y = p3y;
+}
+
 Vec2 CurvedLine::GetControlPoint()
 {
    return (*this->controlPoint);
