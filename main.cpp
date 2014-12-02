@@ -8,6 +8,8 @@
 #include "Rectangle.h"
 #include "Circle.h"
 #include "CurvedLine.h"
+#include "Sprite.h"
+
 
 
 int main(int argc, char *argv[])
@@ -31,9 +33,16 @@ int main(int argc, char *argv[])
       SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
    SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
 
+   FILE *f;
+   errno_t err;
+
+   int len = 0;
+   int read;
 
    unsigned int lastTime = SDL_GetTicks();
    bool go = true;
+
+   Sprite* GUI = new Sprite;
 
    //My std::vectors, may remove and try and put everything in one Shapes Vector but I'll get to that....
    std::vector<Shape*> shapes;
@@ -44,12 +53,48 @@ int main(int argc, char *argv[])
    std::vector<CurvedLine*> curvedlines;
 
    //A selector to choose which tool to use
-   int selector = 3;
+   int selector = 0;
    int test = 0;
+
+   //Loading the line by default until it's changed
+   GUI->LoadFromBMP("line.png", renderer);
+  //if ((err = fopen_s(&f, "savedata.txt", "r")) != 0)
+  //{
+  //   return 0;
+  //}
+  //else
+  //{
+  //   while (1) {
+  //      if (fgets(line, 150, fp) == NULL) break;
+  //      i++; 
+  //      printf("%3d: %s", i, line);
+  //   }
+  //
+  //}
 
    //The game loop
    while (go)
    {
+      //Selecting the correct image to load based on what is selected, seemed more efficient to load 1 image at a time rather than 4 and swapping one out each time... not sure
+      switch (selector)
+      {
+      case 0:
+         //Straight Line
+         GUI->LoadFromBMP("line.png", renderer);
+         break;
+      case 1:
+         //Rectangle
+         GUI->LoadFromBMP("rectangle.png", renderer);
+         break;
+      case 2:
+         //Circle
+         GUI->LoadFromBMP("circle.png", renderer);
+         break;
+      case 3:
+         //Curved Line
+         GUI->LoadFromBMP("curved.png", renderer);
+         break;
+      }
       SDL_Event incomingEvent;
       while (SDL_PollEvent(&incomingEvent))  //Checking which event is coming in
       {
@@ -182,6 +227,9 @@ int main(int argc, char *argv[])
          }
       }
 
+      //Drawing the GUI
+      GUI->Draw(0, 0, renderer);
+
       //if (!shapes.empty())
       //{
       //	for (int i = 0; i < shapes.size(); ++i)
@@ -190,6 +238,7 @@ int main(int argc, char *argv[])
       //	}
       //}
 
+      
 
       // This tells the renderer to actually show its contents to the screen
       // We'll get into this sort of thing at a later date - or just look up 'double buffering' if you're impatient :P
@@ -208,15 +257,15 @@ int main(int argc, char *argv[])
    //MESSY save stuff down here, all temporary
    //-----------------------------------------------------------------//
    //-----------------------------------------------------------------//
-
-   FILE *f;
-   errno_t err;
+   int count = 0;
    if ((err = fopen_s(&f, "savedata.txt", "w")) != 0)
    {
       return 0;
    }
    else
    {
+      count = lines.size() + rectangles.size() + circles.size() + curvedlines.size();
+      fprintf(f, "%i \n", count);
       if (!lines.empty())
       {
          for (int i = 0; i < lines.size(); ++i)
@@ -267,7 +316,6 @@ int main(int argc, char *argv[])
                curvedlines[i]->GetControlPoint().y);
          }
       }
-
       fclose(f);
    }
 
