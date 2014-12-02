@@ -9,7 +9,7 @@
 class Shape
 {
 public:
-   std::vector<Shape*> shapes;
+   //std::vector<Shape*> shapes;
    virtual void Point(SDL_Event& mouseEvent, SDL_Renderer* renderer);   //Virtual so I can overwrite them when I need to
    virtual void Draw(SDL_Renderer* renderer);
 

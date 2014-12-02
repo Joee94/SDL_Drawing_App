@@ -3,7 +3,9 @@
 #include <SDL.h>
 // iostream is so we can output error messages to console
 #include <iostream>
+#include <fstream>
 #include <vector>
+#include <sstream>
 #include "StraightLine.h"
 #include "Rectangle.h"
 #include "Circle.h"
@@ -36,8 +38,6 @@ int main(int argc, char *argv[])
    FILE *f;
    errno_t err;
 
-   int len = 0;
-   int read;
 
    unsigned int lastTime = SDL_GetTicks();
    bool go = true;
@@ -54,23 +54,44 @@ int main(int argc, char *argv[])
 
    //A selector to choose which tool to use
    int selector = 0;
-   int test = 0;
 
    //Loading the line by default until it's changed
    GUI->LoadFromBMP("line.png", renderer);
-  //if ((err = fopen_s(&f, "savedata.txt", "r")) != 0)
-  //{
-  //   return 0;
-  //}
-  //else
-  //{
-  //   while (1) {
-  //      if (fgets(line, 150, fp) == NULL) break;
-  //      i++; 
-  //      printf("%3d: %s", i, line);
-  //   }
-  //
-  //}
+
+   //Blech this wasn't fun
+   std::ifstream saveData("savedata.txt");   //m'file
+   std::string currentLine;   //m'line
+   std::vector<std::string> types;  //m'types
+   
+   while (std::getline(saveData, currentLine))  //Are there lines?
+   {
+      std::stringstream linestream(currentLine);   //YES THERE ARE
+      std::string type;    //The type of shape we gon' draw
+      float x0;   //bunch of co-ordinates
+      float y0;
+      float x1;
+      float y1;
+      float x2;
+      float y2;
+   
+      std::getline(linestream, type, '\t');  //let's grab that line, take the first string (the type) then stop when we hit a tab
+   
+      linestream >> x0 >> y0 >> x1 >> y1 >> x2 >> y2; //then just get the rest
+      std::cout << type << " " << x0 << " " << y0 << " " << x1 << " " << y1 << " " << x2 << " " << y2 << std::endl;    //debugging mostly
+      types.push_back(type);  //add it to some types array for later
+   }
+
+   //This is that "later"
+   //for (uint32_t i = 0; i < types.size(); ++i)
+   //{
+   //   if (types[i] == "L")
+   //   {
+   //
+   //   }
+   //}
+
+   saveData.close();
+
 
    //The game loop
    while (go)
@@ -197,7 +218,7 @@ int main(int argc, char *argv[])
       //This is poor I might try and fix this, however if this is the finished product and there are still 50 for loops here - Sorry !!!
       if (!lines.empty())
       {
-         for (int i = 0; i < lines.size(); ++i)
+         for (uint32_t i = 0; i < lines.size(); ++i)
          {
             lines[i]->Draw(renderer);
          }
@@ -205,7 +226,7 @@ int main(int argc, char *argv[])
 
       if (!rectangles.empty())
       {
-         for (int i = 0; i < rectangles.size(); ++i)
+         for (uint32_t i = 0; i < rectangles.size(); ++i)
          {
             rectangles[i]->Draw(renderer);
          }
@@ -213,7 +234,7 @@ int main(int argc, char *argv[])
 
       if (!circles.empty())
       {
-         for (int i = 0; i < circles.size(); ++i)
+         for (uint32_t i = 0; i < circles.size(); ++i)
          {
             circles[i]->Draw(renderer);
          }
@@ -221,7 +242,7 @@ int main(int argc, char *argv[])
 
       if (!curvedlines.empty())
       {
-         for (int i = 0; i < curvedlines.size(); ++i)
+         for (uint32_t i = 0; i < curvedlines.size(); ++i)
          {
             curvedlines[i]->Draw(renderer);
          }
@@ -257,20 +278,17 @@ int main(int argc, char *argv[])
    //MESSY save stuff down here, all temporary
    //-----------------------------------------------------------------//
    //-----------------------------------------------------------------//
-   int count = 0;
    if ((err = fopen_s(&f, "savedata.txt", "w")) != 0)
    {
       return 0;
    }
    else
    {
-      count = lines.size() + rectangles.size() + circles.size() + curvedlines.size();
-      fprintf(f, "%i \n", count);
       if (!lines.empty())
       {
          for (int i = 0; i < lines.size(); ++i)
          {
-            fprintf(f, "L %f %f %f %f \n",
+            fprintf(f, "L\t%f\t%f\t%f\t%f\t%f\t%f\n",
                lines[i]->GetPoint1().x,
                lines[i]->GetPoint1().y,
                lines[i]->GetPoint2().x,
@@ -283,7 +301,7 @@ int main(int argc, char *argv[])
       {
          for (int i = 0; i < rectangles.size(); ++i)
          {
-            fprintf(f, "R %f %f %f %f \n",
+            fprintf(f, "R\t%f\t%f\t%f\t%f\t%f\t%f\n",
                rectangles[i]->GetPoint1().x,
                rectangles[i]->GetPoint1().y,
                rectangles[i]->GetPoint2().x,
@@ -295,7 +313,7 @@ int main(int argc, char *argv[])
       {
          for (int i = 0; i < circles.size(); ++i)
          {
-            fprintf(f, "C %f %f %f %f \n",
+            fprintf(f, "C\t%f\t%f\t%f\t%f\t%f\t%f\n",
                circles[i]->GetPoint1().x,
                circles[i]->GetPoint1().y,
                circles[i]->GetPoint2().x,
@@ -307,7 +325,7 @@ int main(int argc, char *argv[])
       {
          for (int i = 0; i < curvedlines.size(); ++i)
          {
-            fprintf(f, "CL %f %f %f %f %f %f\n",
+            fprintf(f, "CL\t%f\t%f\t%f\t%f\t%f\t%f\n",
                curvedlines[i]->GetPoint1().x,
                curvedlines[i]->GetPoint1().y,
                curvedlines[i]->GetPoint2().x,
