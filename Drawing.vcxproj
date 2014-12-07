@@ -13,8 +13,11 @@
   <ItemGroup>
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="CurvedLine.cpp" />
+    <ClCompile Include="Fill.cpp" />
+    <ClCompile Include="LoadFile.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="SaveFile.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="StraightLine.cpp" />
@@ -22,11 +25,15 @@
   <ItemGroup>
     <ClInclude Include="Circle.h" />
     <ClInclude Include="CurvedLine.h" />
+    <ClInclude Include="Fill.h" />
+    <ClInclude Include="LoadFile.h" />
     <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="SaveFile.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="StraightLine.h" />
     <ClInclude Include="Vec2.h" />
+    <ClInclude Include="Vec3.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{510636A6-D77C-44CC-B231-E87E2C569AE4}</ProjectGuid>

@@ -4,7 +4,8 @@ StraightLine::StraightLine()
 {
    //Create some points...
 	point1 = new Vec2();
-	point2 = new Vec2();
+   point2 = new Vec2();
+   shapeType = 0;
 }
 
 StraightLine::~StraightLine()

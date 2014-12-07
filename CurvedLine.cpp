@@ -6,6 +6,7 @@ CurvedLine::CurvedLine()
    point1 = new Vec2();
    point2 = new Vec2();
    controlPoint = new Vec2();
+   shapeType = 3;
 }
 
 CurvedLine::~CurvedLine()
@@ -56,45 +57,10 @@ void CurvedLine::Draw(SDL_Renderer* renderer)
    SDL_RenderDrawLine(renderer, startX, startY, point2->x, point2->y);
 }
 
-void CurvedLine::Point(SDL_Event& mouseEvent, SDL_Renderer* renderer, int num)
-{
-   //had to use a "num" thing here because I'm using mouseup twice
-	switch (num)
-	{
-	case 0:
-      //I plot all three points when mosuedown is pressed otherwise I get a bug where the point is initialised to 0,0 immediately and things just go wrong until you plot the other points
-		point1->x = mouseEvent.button.x;
-      point1->y = mouseEvent.button.y;
-      point2->x = mouseEvent.button.x;
-      point2->y = mouseEvent.button.y;
-      controlPoint->x = mouseEvent.button.x;
-      controlPoint->y = mouseEvent.button.y;
-		break;
-	case 1:
-		point2->x = mouseEvent.button.x;
-		point2->y = mouseEvent.button.y;
-		break;
-	case 2:
-		controlPoint->x = mouseEvent.button.x;
-		controlPoint->y = mouseEvent.button.y;
-		break;
-	}
-}
-
 Vec2 CurvedLine::QuadBezierSample2(Vec2 a, Vec2 b, Vec2 control, float t)
 {
    //Magic...
 	return ((1.0f - t)*(1.0f - t)*a) + (2.0f*(1.0f - t)*t*control) + (t*t*b);
-}
-
-void CurvedLine::Point(SDL_Renderer* renderer, float p1x, float p1y, float p2x, float p2y, float p3x, float p3y)
-{
-   point1->x = p1x;
-   point1->y = p1y;
-   point2->x = p2x;
-   point2->y = p2y;
-   controlPoint->x = p3x;
-   controlPoint->y = p3y;
 }
 
 Vec2 CurvedLine::GetControlPoint()
