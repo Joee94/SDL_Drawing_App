@@ -15,6 +15,7 @@
 #include "Fill.h"
 
 void LoadFile(SDL_Renderer* renderer, std::vector<Shape*> &shapes, std::string filename);
+int SaveFile(std::vector<Shape*> shapes);
 
 int main(int argc, char *argv[])
 {
@@ -97,7 +98,6 @@ int main(int argc, char *argv[])
             dropped_filedir = incomingEvent.drop.file;
             LoadFile(renderer, shapes, dropped_filedir);
             break;
-
          }
          case SDL_MOUSEBUTTONDOWN:  //When the user presses the mouse button is will create a new object and add it to a vector
             switch (selector)
@@ -174,6 +174,8 @@ int main(int argc, char *argv[])
             case SDLK_5:
                selector = 5;
                break;
+            case SDLK_s:
+               SaveFile(shapes);
             }
             break;
          }
@@ -222,46 +224,9 @@ int main(int argc, char *argv[])
    }
    // If we get outside the main game loop, it means our user has requested we exit
 
-   //MESSY save stuff down here, all temporary
    //-----------------------------------------------------------------//
    //-----------------------------------------------------------------//
-   FILE *f;
-   errno_t err;
-
-   if ((err = fopen_s(&f, "savedata.txt", "w")) != 0)
-   {
-      return 0;
-   }
-   else
-   {
-      if (!shapes.empty())
-      {
-         for (int i = 0; i < shapes.size(); ++i)
-         {
-            if (shapes[i]->GetShapeType() != 3)
-            {
-               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\n",      //So... this is where all the stuff is output to a text doc, issues with the control point meant
-                  shapes[i]->GetShapeType(),                   //I had to split this up into shapes with 2 points and shapes with 3... bleh I tried other methods
-                  shapes[i]->GetPoint1().x,                    //but nothing worked :( (Still shorter than my last attempt)
-                  shapes[i]->GetPoint1().y,
-                  shapes[i]->GetPoint2().x,
-                  shapes[i]->GetPoint2().y);
-            }
-            else
-            {
-               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\n",
-                  shapes[i]->GetShapeType(),
-                  shapes[i]->GetPoint1().x,
-                  shapes[i]->GetPoint1().y,
-                  shapes[i]->GetPoint2().x,
-                  shapes[i]->GetPoint2().y,
-                  shapes[i]->GetControlPoint().x,
-                  shapes[i]->GetControlPoint().y);
-            }
-         }
-      }
-      fclose(f);
-   }
+   
 
    //-----------------------------------------------------------------//
    //-----------------------------------------------------------------//
@@ -316,4 +281,45 @@ void LoadFile(SDL_Renderer* renderer, std::vector<Shape*> &shapes, std::string f
 
    saveData.close();
 
+}
+
+int SaveFile(std::vector<Shape*> shapes)
+{
+   FILE *f;
+   errno_t err;
+
+   if ((err = fopen_s(&f, "savedata.joe", "w")) != 0)
+   {
+      return 0;
+   }
+   else
+   {
+      if (!shapes.empty())
+      {
+         for (int i = 0; i < shapes.size(); ++i)
+         {
+            if (shapes[i]->GetShapeType() != 3)
+            {
+               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\n",      //So... this is where all the stuff is output to a text doc, issues with the control point meant
+                  shapes[i]->GetShapeType(),                   //I had to split this up into shapes with 2 points and shapes with 3... bleh I tried other methods
+                  shapes[i]->GetPoint1().x,                    //but nothing worked :( (Still shorter than my last attempt)
+                  shapes[i]->GetPoint1().y,
+                  shapes[i]->GetPoint2().x,
+                  shapes[i]->GetPoint2().y);
+            }
+            else
+            {
+               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\n",
+                  shapes[i]->GetShapeType(),
+                  shapes[i]->GetPoint1().x,
+                  shapes[i]->GetPoint1().y,
+                  shapes[i]->GetPoint2().x,
+                  shapes[i]->GetPoint2().y,
+                  shapes[i]->GetControlPoint().x,
+                  shapes[i]->GetControlPoint().y);
+            }
+         }
+      }
+      fclose(f);
+   }
 }
