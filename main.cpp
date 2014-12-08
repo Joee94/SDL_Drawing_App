@@ -14,6 +14,8 @@
 #include "Sprite.h"
 #include "Fill.h"
 
+void LoadFile(SDL_Renderer* renderer, std::vector<Shape*> &shapes, std::string filename);
+
 int main(int argc, char *argv[])
 {
    if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -49,55 +51,6 @@ int main(int argc, char *argv[])
    //Loading the line by default until it's changed
    GUI->LoadFromBMP("line.png", renderer);
 
-   //Blech this wasn't fun
-   FILE *f;
-   errno_t err;
-
-   std::ifstream saveData("savedata.txt");   //m'file
-   std::string currentLine;   //m'line
-   std::vector<int> types;  //m'types
-   
-   while (std::getline(saveData, currentLine))  //Are there lines?
-   {
-      std::stringstream linestream(currentLine);   //YES THERE ARE
-      int type;    //The type of shape we gon' draw
-      float x0;   //bunch of co-ordinates
-      float y0;
-      float x1;
-      float y1;
-      float x2;
-      float y2;
-   
-   
-      linestream >> type >> x0 >> y0 >> x1 >> y1 >> x2 >> y2; //then just get the rest
-      std::cout << type << " " << x0 << " " << y0 << " " << x1 << " " << y1 << " " << x2 << " " << y2 << std::endl;    //debugging mostly
-      
-      //eh I couldn't do a case statement for strings, I probably shoudl just use ints.... maybe if I can be assed in the future.
-      switch (type)
-      {
-      case 0:
-         shapes.push_back(new StraightLine());
-         shapes.back()->Point(renderer, x0, y0, x1, y1);
-         break;
-      case 1:
-         shapes.push_back(new Rectangle());
-         shapes.back()->Point(renderer, x0, y0, x1, y1);
-         break;
-      case 2:
-         shapes.push_back(new Circle());
-         shapes.back()->Point(renderer, x0, y0, x1, y1);
-         break;
-      case 3:
-         shapes.push_back(new CurvedLine());
-         shapes.back()->Point(renderer, x0, y0, x1, y1, x2, y2);
-         break;
-      }
-      types.push_back(type);  //add it to some types array for later
-   }
-
-
-   saveData.close();
-
    //Set text color as black 
    SDL_Color textColor = { 0, 0, 0, 0xFF }; 
    //The current input text. 
@@ -105,6 +58,8 @@ int main(int argc, char *argv[])
 //   gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor ); 
    //Enable text input 
    SDL_StartTextInput();
+
+   std::string dropped_filedir;                  // Pointer for directory of dropped file
 
    //The game loop
    while (go)
@@ -137,6 +92,13 @@ int main(int argc, char *argv[])
          case SDL_QUIT:
             go = false;
             break;
+         case SDL_DROPFILE: 
+         {
+            dropped_filedir = incomingEvent.drop.file;
+            LoadFile(renderer, shapes, dropped_filedir);
+            break;
+
+         }
          case SDL_MOUSEBUTTONDOWN:  //When the user presses the mouse button is will create a new object and add it to a vector
             switch (selector)
             {
@@ -263,6 +225,9 @@ int main(int argc, char *argv[])
    //MESSY save stuff down here, all temporary
    //-----------------------------------------------------------------//
    //-----------------------------------------------------------------//
+   FILE *f;
+   errno_t err;
+
    if ((err = fopen_s(&f, "savedata.txt", "w")) != 0)
    {
       return 0;
@@ -306,4 +271,49 @@ int main(int argc, char *argv[])
    SDL_Quit();
 
    return 0;
+}
+
+void LoadFile(SDL_Renderer* renderer, std::vector<Shape*> &shapes, std::string filename)
+{
+
+   //Blech this wasn't fun
+   std::ifstream saveData(filename);   //m'file
+   std::string currentLine;   //m'line
+   std::vector<int> types;  //m'types
+
+   while (std::getline(saveData, currentLine))  //Are there lines?
+   {
+      std::stringstream linestream(currentLine);   //YES THERE ARE
+      int type;    //The type of shape we gon' draw
+      float x0, y0, x1, y1, x2, y2;   //bunch of co-ordinates
+
+      linestream >> type >> x0 >> y0 >> x1 >> y1 >> x2 >> y2; //then just get the rest
+      std::cout << type << " " << x0 << " " << y0 << " " << x1 << " " << y1 << " " << x2 << " " << y2 << std::endl;    //debugging mostly
+
+      //eh I couldn't do a case statement for strings, I probably shoudl just use ints.... maybe if I can be assed in the future.
+      switch (type)
+      {
+      case 0:
+         shapes.push_back(new StraightLine());
+         shapes.back()->Point(renderer, x0, y0, x1, y1);
+         break;
+      case 1:
+         shapes.push_back(new Rectangle());
+         shapes.back()->Point(renderer, x0, y0, x1, y1);
+         break;
+      case 2:
+         shapes.push_back(new Circle());
+         shapes.back()->Point(renderer, x0, y0, x1, y1);
+         break;
+      case 3:
+         shapes.push_back(new CurvedLine());
+         shapes.back()->Point(renderer, x0, y0, x1, y1, x2, y2);
+         break;
+      }
+      types.push_back(type);  //add it to some types array for later
+   }
+
+
+   saveData.close();
+
 }

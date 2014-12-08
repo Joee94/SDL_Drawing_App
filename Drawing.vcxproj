@@ -16,6 +16,7 @@
     <ClCompile Include="Fill.cpp" />
     <ClCompile Include="LoadFile.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PixelAccess.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="SaveFile.cpp" />
     <ClCompile Include="Shape.cpp" />
@@ -27,6 +28,7 @@
     <ClInclude Include="CurvedLine.h" />
     <ClInclude Include="Fill.h" />
     <ClInclude Include="LoadFile.h" />
+    <ClInclude Include="PixelAccess.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="SaveFile.h" />
     <ClInclude Include="Shape.h" />

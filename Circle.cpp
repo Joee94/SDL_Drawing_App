@@ -18,7 +18,7 @@ Circle::~Circle()
 void Circle::Draw(SDL_Renderer* renderer)
 {
    //Ok I'm not 100% sure how this works, circles are complicated
-
+   
    float x0 = point1->x;  //assign my point1 co-ordinates to x0 and y0
    float y0 = point1->y;
    float radiusx = fabs(point2->x - point1->x);   //find the radius, for some reason length doesn't work or something... idk
