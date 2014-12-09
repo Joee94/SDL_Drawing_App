@@ -15,11 +15,11 @@ Rectangle::~Rectangle()
 	delete point2;
 }
 
-void Rectangle::Draw(SDL_Renderer* renderer)
+void Rectangle::Draw(SDL_Renderer* renderer, float r, float g, float b)
 {
    //Another easy one, create a rectangle then draw it, don't erally see WHY I have to create one before drawing it but I'm sure it has its benefits
 	SDL_Rect temp = {point1->x, point1->y, point2->x- point1->x, point2->y - point1->y}; 
-	SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
+	SDL_SetRenderDrawColor( renderer, r, g, b, 0xFF );
 	SDL_RenderDrawRect(renderer, &temp); 
 }
 

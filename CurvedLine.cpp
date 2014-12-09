@@ -20,7 +20,7 @@ CurvedLine::~CurvedLine()
 
 //Need to take the point class and draw a third point for the control point........
 
-void CurvedLine::Draw(SDL_Renderer* renderer)
+void CurvedLine::Draw(SDL_Renderer* renderer, float r, float g, float b)
 {
 	float startX = point1->x;
 	float startY = point1->y;
@@ -35,7 +35,7 @@ void CurvedLine::Draw(SDL_Renderer* renderer)
    #endif
 
 
-	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	SDL_SetRenderDrawColor(renderer, r, g, b, 0xFF);
    //Parallel for loop learnt from rob
    #pragma omp parallel for
    for (int i = 1; i < numSamples; ++i)

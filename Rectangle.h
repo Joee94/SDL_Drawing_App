@@ -10,5 +10,5 @@ public:
 	~Rectangle();
 
    //Just a draw function
-   void Rectangle::Draw(SDL_Renderer* renderer);
+   void Draw(SDL_Renderer* renderer, float r, float g, float b);
 };

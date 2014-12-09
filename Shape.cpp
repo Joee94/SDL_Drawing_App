@@ -65,7 +65,7 @@ void Shape::Point(SDL_Renderer* renderer, float p1x, float p1y, float p2x, float
 }
 
 
-void Shape::Draw(SDL_Renderer* renderer)
+void Shape::Draw(SDL_Renderer* renderer, float r, float g, float b)
 {
 }
 

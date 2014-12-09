@@ -14,7 +14,7 @@ public:
    virtual void Point(SDL_Renderer* renderer, float p1x, float p2x, float p1y, float p2y);
    virtual void Point(SDL_Event& mouseEvent, SDL_Renderer* renderer, int num);
    virtual void Point(SDL_Renderer* renderer, float p1x, float p1y, float p2x, float p2y, float p3x, float p3y);
-   virtual void Draw(SDL_Renderer* renderer);
+   virtual void Draw(SDL_Renderer* renderer, float r, float g, float b);
 
    Vec2 GetPoint1();
    Vec2 GetPoint2();

@@ -1,4 +1,7 @@
-
+#define SLIDER_TL_X 78
+#define SLIDER_TL_Y 13
+#define SLIDER_BR_X 201
+#define SLIDER_BR_Y 26
 // This is the main SDL include file
 #include <SDL.h>
 #include <SDL_Image.h>
@@ -13,9 +16,11 @@
 #include "CurvedLine.h"
 #include "Sprite.h"
 #include "Fill.h"
+#include "Position.h"
 
 void LoadFile(SDL_Renderer* renderer, std::vector<Shape*> &shapes, std::string filename);
 int SaveFile(std::vector<Shape*> shapes);
+float ColourValue(float v);
 
 int main(int argc, char *argv[])
 {
@@ -41,27 +46,39 @@ int main(int argc, char *argv[])
    bool go = true;
 
    Sprite* GUI = new Sprite;
+   Sprite* ColourPicker = new Sprite;
+   Sprite* Slider = new Sprite;
    Fill* Bucket = new Fill;
+   Position* pos = new Position;
 
    //My std::vectors, may remove and try and put everything in one Shapes Vector but I'll get to that....
    std::vector<Shape*> shapes;
-
-   //A selector to choose which tool to use
-   int selector = 0;
-
-   //Loading the line by default until it's changed
-   GUI->LoadFromBMP("line.png", renderer);
-
-   //Set text color as black 
-   SDL_Color textColor = { 0, 0, 0, 0xFF }; 
-   //The current input text. 
-   std::string inputText = "Some Text"; 
-//   gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor ); 
-   //Enable text input 
-   SDL_StartTextInput();
-
    std::string dropped_filedir;                  // Pointer for directory of dropped file
 
+   //There MUST be a better way to do this.... I'm just tired
+   float slider_r = 72.0f;
+   float slider_g = 72.0f;
+   float slider_b = 72.0f;
+
+   Vec2* slider_min_r = new Vec2(SLIDER_TL_X, SLIDER_TL_Y);
+   Vec2* slider_max_r = new Vec2(SLIDER_BR_X, SLIDER_BR_Y);
+
+   Vec2* slider_min_g = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+32);
+   Vec2* slider_max_g = new Vec2(SLIDER_BR_X , SLIDER_BR_Y+32);
+
+   Vec2* slider_min_b = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+64);
+   Vec2* slider_max_b = new Vec2(SLIDER_BR_X, SLIDER_BR_Y+64);
+
+   Vec2* testa = new Vec2(78, 13);
+   Vec2* testb = new Vec2(201, 26);
+
+   //Loading the line by default until it's changed
+
+   GUI->LoadFromBMP("line.png", renderer);
+   ColourPicker->LoadFromBMP("picker.png", renderer);
+   Slider->LoadFromBMP("slider.png", renderer);
+   //A selector to choose which tool to use
+   int selector = 0;
    //The game loop
    while (go)
    {
@@ -93,13 +110,25 @@ int main(int argc, char *argv[])
          case SDL_QUIT:
             go = false;
             break;
-         case SDL_DROPFILE: 
+         case SDL_DROPFILE:
          {
             dropped_filedir = incomingEvent.drop.file;
             LoadFile(renderer, shapes, dropped_filedir);
             break;
          }
          case SDL_MOUSEBUTTONDOWN:  //When the user presses the mouse button is will create a new object and add it to a vector
+            if (pos->CheckPosition(incomingEvent, *slider_min_r, *slider_max_r))
+            {
+               slider_r = pos->GetPosition(incomingEvent).x;
+            }
+            else if (pos->CheckPosition(incomingEvent, *slider_min_g, *slider_max_g))
+            {
+               slider_g = pos->GetPosition(incomingEvent).x;
+            }
+            else if (pos->CheckPosition(incomingEvent, *slider_min_b, *slider_max_b))
+            {
+               slider_b = pos->GetPosition(incomingEvent).x;
+            }
             switch (selector)
             {
             case 0:
@@ -127,7 +156,7 @@ int main(int argc, char *argv[])
                //Fill
                SDL_Surface *surface = SDL_GetWindowSurface(window);
                Vec2 point = Bucket->Point(incomingEvent, renderer);
-               std::cout<<Bucket->getpixel(surface, point.x, point.y);
+               std::cout << Bucket->getpixel(surface, point.x, point.y);
                break;
             }
             break;
@@ -195,20 +224,23 @@ int main(int argc, char *argv[])
       SDL_RenderClear(renderer);
 
 
+
       //Hooray, one single loop to draw everything :o)
-     if (!shapes.empty())
-     {
-     	for (int i = 0; i < shapes.size(); ++i)
-     	{
-     		shapes[i]->Draw(renderer);
-     	}
-     }
+      if (!shapes.empty())
+      {
+         for (uint32_t i = 0; i < shapes.size(); ++i)
+         {
+            shapes[i]->Draw(renderer, ColourValue(slider_r), ColourValue(slider_g), ColourValue(slider_b));
+         }
+      }
 
       //Drawing the GUI
 
-      GUI->Draw(0, 0, renderer); 
-      SDL_Rect temp = { 100, 100, 200, 50 };
-      SDL_SetTextInputRect(&temp);
+      GUI->Draw(0, 0, renderer);
+      ColourPicker->Draw(50, 0, renderer);
+      Slider->Draw(slider_r, 10, renderer);
+      Slider->Draw(slider_g, 41, renderer);
+      Slider->Draw(slider_b, 72, renderer);
 
       // This tells the renderer to actually show its contents to the screen
       // We'll get into this sort of thing at a later date - or just look up 'double buffering' if you're impatient :P
@@ -224,12 +256,6 @@ int main(int argc, char *argv[])
    }
    // If we get outside the main game loop, it means our user has requested we exit
 
-   //-----------------------------------------------------------------//
-   //-----------------------------------------------------------------//
-   
-
-   //-----------------------------------------------------------------//
-   //-----------------------------------------------------------------//
 
    // Our cleanup phase, hopefully fairly self-explanatory ;)
    SDL_DestroyWindow(window);
@@ -296,7 +322,7 @@ int SaveFile(std::vector<Shape*> shapes)
    {
       if (!shapes.empty())
       {
-         for (int i = 0; i < shapes.size(); ++i)
+         for (uint32_t i = 0; i < shapes.size(); ++i)
          {
             if (shapes[i]->GetShapeType() != 3)
             {
@@ -322,4 +348,10 @@ int SaveFile(std::vector<Shape*> shapes)
       }
       fclose(f);
    }
+}
+
+float ColourValue(float v)
+{
+   v = v * 0.4823529411764;
+   return v;
 }
