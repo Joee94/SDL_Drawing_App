@@ -18,8 +18,8 @@
 #include "Fill.h"
 #include "Position.h"
 
-void LoadFile(SDL_Renderer* renderer, std::vector<Shape*> &shapes, std::string filename);
-int SaveFile(std::vector<Shape*> shapes);
+void LoadFile(std::vector<Shape*> &shapes, std::string filename);
+void SaveFile(std::vector<Shape*> shapes);
 float ColourValue(uint8_t v);
 
 int main(int argc, char *argv[])
@@ -56,9 +56,9 @@ int main(int argc, char *argv[])
    std::string dropped_filedir;                  // Pointer for directory of dropped file
 
    //There MUST be a better way to do this.... I'm just tired
-   uint8_t slider_r = 72.0f;
-   uint8_t slider_g = 72.0f;
-   uint8_t slider_b = 72.0f;
+   uint8_t slider_r = 72;
+   uint8_t slider_g = 72;
+   uint8_t slider_b = 72;
 
    Vec2* slider_min_r = new Vec2(SLIDER_TL_X, SLIDER_TL_Y);
    Vec2* slider_max_r = new Vec2(SLIDER_BR_X, SLIDER_BR_Y);
@@ -68,9 +68,6 @@ int main(int argc, char *argv[])
 
    Vec2* slider_min_b = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+64);
    Vec2* slider_max_b = new Vec2(SLIDER_BR_X, SLIDER_BR_Y+64);
-
-   Vec2* testa = new Vec2(78, 13);
-   Vec2* testb = new Vec2(201, 26);
 
    //Loading the line by default until it's changed
 
@@ -113,7 +110,7 @@ int main(int argc, char *argv[])
          case SDL_DROPFILE:
          {
             dropped_filedir = incomingEvent.drop.file;
-            LoadFile(renderer, shapes, dropped_filedir);
+            LoadFile(shapes, dropped_filedir);
             break;
          }
          case SDL_MOUSEBUTTONDOWN:  //When the user presses the mouse button is will create a new object and add it to a vector
@@ -129,37 +126,45 @@ int main(int argc, char *argv[])
             {
                slider_b = pos->GetPosition(incomingEvent).x;
             }
-            switch (selector)
+            else
             {
-            case 0:
-               //Straight Line
-               shapes.push_back(new StraightLine());   //Adding to vector
-               shapes.back()->Point(incomingEvent, renderer);   //Calling the point function to start plotting the first point
-               break;
-            case 1:
-               //Rectangle
-               shapes.push_back(new Rectangle());    //etc. etc.
-               shapes.back()->Point(incomingEvent, renderer);
-               break;
-            case 2:
-               //Circle
-               shapes.push_back(new Circle());
-               shapes.back()->Point(incomingEvent, renderer);
-               break;
-            case 3:
-               //Curved Line
-               std::cout << "point1";
-               shapes.push_back(new CurvedLine());
-               shapes.back()->Point(incomingEvent, renderer, 0);
-               break;
-            case 5:
-               //Fill
-               SDL_Surface *surface = SDL_GetWindowSurface(window);
-               Vec2 point = Bucket->Point(incomingEvent, renderer);
-               std::cout << Bucket->getpixel(surface, point.x, point.y);
-               break;
+               switch (selector)
+               {
+               case 0:
+                  //Straight Line
+                  shapes.push_back(new StraightLine());   //Adding to vector
+                  shapes.back()->Point(incomingEvent);   //Calling the point function to start plotting the first point
+                  shapes.back()->Colour(slider_r, slider_g, slider_b);
+                  break;
+               case 1:
+                  //Rectangle
+                  shapes.push_back(new Rectangle());    //etc. etc.
+                  shapes.back()->Point(incomingEvent);
+                  shapes.back()->Colour(slider_r, slider_g, slider_b);
+                  break;
+               case 2:
+                  //Circle
+                  shapes.push_back(new Circle());
+                  shapes.back()->Point(incomingEvent);
+                  shapes.back()->Colour(slider_r, slider_g, slider_b);
+                  break;
+               case 3:
+                  //Curved Line
+                  std::cout << "point1";
+                  shapes.push_back(new CurvedLine());
+                  shapes.back()->Point(incomingEvent, 0);
+                  shapes.back()->Colour(slider_r, slider_g, slider_b);
+                  break;
+               case 5:
+                  //Fill
+                  SDL_Surface *surface = SDL_GetWindowSurface(window);
+                  Vec2 point = Bucket->Point(incomingEvent);
+                  std::cout << Bucket->getpixel(surface, point.x, point.y);
+                  break;
+               }
             }
             break;
+            //Bit of an issue, basically don't drag things into the top left 
          case SDL_MOUSEBUTTONUP:
             switch (selector)
             {
@@ -167,17 +172,17 @@ int main(int argc, char *argv[])
             case 1:
             case 2:
                //Straight Line
-               shapes.back()->Point(incomingEvent, renderer);   //I then access the same object created before and call Point again for the second point...
+               shapes.back()->Point(incomingEvent);   //I then access the same object created before and call Point again for the second point...
                break;
             case 3:
                //Curved Line
-               shapes.back()->Point(incomingEvent, renderer, 1);
+               shapes.back()->Point(incomingEvent, 1);
                selector = 4;
                break;
             case 4:
                //Control Point of Curved Line
                std::cout << "point3";
-               shapes.back()->Point(incomingEvent, renderer, 2);   // Or sometimes the 3rd point based on the shape
+               shapes.back()->Point(incomingEvent, 2);   // Or sometimes the 3rd point based on the shape
                selector = 3;
                break;
 
@@ -229,13 +234,12 @@ int main(int argc, char *argv[])
       {
          for (uint32_t i = 0; i < shapes.size(); ++i)
          {
-            shapes[i]->Draw(renderer, ColourValue(slider_r - 72), ColourValue(slider_g - 72), ColourValue(slider_b - 72));
+            shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR() - 72), ColourValue(shapes[i]->GetG() - 72), ColourValue(shapes[i]->GetB() - 72));
             std::cout << "r: " << ColourValue(slider_r - 72) << "g: " << ColourValue(slider_g - 72) << "g: " << ColourValue(slider_b - 72) << std::endl;
          }
       }
 
       //Drawing the GUI
-
       GUI->Draw(0, 0, renderer);
       ColourPicker->Draw(50, 0, renderer);
       Slider->Draw(slider_r, 10, renderer);
@@ -264,7 +268,7 @@ int main(int argc, char *argv[])
    return 0;
 }
 
-void LoadFile(SDL_Renderer* renderer, std::vector<Shape*> &shapes, std::string filename)
+void LoadFile(std::vector<Shape*> &shapes, std::string filename)
 {
 
    //Blech this wasn't fun
@@ -286,19 +290,19 @@ void LoadFile(SDL_Renderer* renderer, std::vector<Shape*> &shapes, std::string f
       {
       case 0:
          shapes.push_back(new StraightLine());
-         shapes.back()->Point(renderer, x0, y0, x1, y1);
+         shapes.back()->Point(x0, y0, x1, y1);
          break;
       case 1:
          shapes.push_back(new Rectangle());
-         shapes.back()->Point(renderer, x0, y0, x1, y1);
+         shapes.back()->Point(x0, y0, x1, y1);
          break;
       case 2:
          shapes.push_back(new Circle());
-         shapes.back()->Point(renderer, x0, y0, x1, y1);
+         shapes.back()->Point(x0, y0, x1, y1);
          break;
       case 3:
          shapes.push_back(new CurvedLine());
-         shapes.back()->Point(renderer, x0, y0, x1, y1, x2, y2);
+         shapes.back()->Point(x0, y0, x1, y1, x2, y2);
          break;
       }
       types.push_back(type);  //add it to some types array for later
@@ -309,14 +313,14 @@ void LoadFile(SDL_Renderer* renderer, std::vector<Shape*> &shapes, std::string f
 
 }
 
-int SaveFile(std::vector<Shape*> shapes)
+void SaveFile(std::vector<Shape*> shapes)
 {
    FILE *f;
    errno_t err;
 
    if ((err = fopen_s(&f, "savedata.joe", "w")) != 0)
    {
-      return 0;
+      std::cout << "Error, file not found";
    }
    else
    {

@@ -10,7 +10,7 @@ Fill::~Fill()
    delete point;
 }
 
-Vec2 Fill::Point(SDL_Event& mouseEvent, SDL_Renderer* renderer)
+Vec2 Fill::Point(SDL_Event& mouseEvent)
 {
    switch (mouseEvent.type)
    {

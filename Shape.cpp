@@ -1,6 +1,6 @@
 #include "Shape.h"
 
-void Shape::Point(SDL_Event& mouseEvent, SDL_Renderer* renderer)
+void Shape::Point(SDL_Event& mouseEvent)
 {
    switch (mouseEvent.type)
    {
@@ -21,7 +21,7 @@ void Shape::Point(SDL_Event& mouseEvent, SDL_Renderer* renderer)
    }
 }
 
-void Shape::Point(SDL_Renderer* renderer, float p1x, float p1y, float p2x, float p2y)
+void Shape::Point(float p1x, float p1y, float p2x, float p2y)
 {
    point1->x = p1x;
    point1->y = p1y;
@@ -29,7 +29,7 @@ void Shape::Point(SDL_Renderer* renderer, float p1x, float p1y, float p2x, float
    point2->y = p2y;
 }
 
-void Shape::Point(SDL_Event& mouseEvent, SDL_Renderer* renderer, int num)
+void Shape::Point(SDL_Event& mouseEvent, int num)
 {
    //had to use a "num" thing here because I'm using mouseup twice
    switch (num)
@@ -54,7 +54,7 @@ void Shape::Point(SDL_Event& mouseEvent, SDL_Renderer* renderer, int num)
    }
 }
 
-void Shape::Point(SDL_Renderer* renderer, float p1x, float p1y, float p2x, float p2y, float p3x, float p3y)
+void Shape::Point(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y)
 {
    point1->x = p1x;
    point1->y = p1y;
@@ -64,6 +64,13 @@ void Shape::Point(SDL_Renderer* renderer, float p1x, float p1y, float p2x, float
    controlPoint->y = p3y;
 }
 
+//setting some colours
+void Shape::Colour(uint8_t red, uint8_t green, uint8_t blue)
+{
+   r = red;
+   g = green;
+   b = blue;
+}
 
 void Shape::Draw(SDL_Renderer* renderer, float r, float g, float b)
 {
@@ -88,4 +95,18 @@ int Shape::GetShapeType()
 {
    return (this->shapeType);
 
+}
+
+//Getting some colours
+uint8_t Shape::GetR()
+{
+   return (this->r);
+}
+uint8_t Shape::GetG()
+{
+   return (this->g);
+}
+uint8_t Shape::GetB()
+{
+   return (this->b);
 }

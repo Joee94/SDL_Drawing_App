@@ -12,7 +12,7 @@ public:
    ~Fill();
 
    uint32_t Fill::getpixel(SDL_Surface* surface, int x, int y);
-   Vec2 Point(SDL_Event& mouseEvent, SDL_Renderer* renderer);
+   Vec2 Point(SDL_Event& mouseEvent);
 
 private:
    Vec2* point;

@@ -49,7 +49,7 @@ void Circle::Draw(SDL_Renderer* renderer, float r, float g, float b)
       SDL_RenderDrawPoint(renderer, -y + x0, x + y0);
       SDL_RenderDrawPoint(renderer, -x + x0, -y + y0);
       SDL_RenderDrawPoint(renderer, -y + x0, -x + y0);
-      SDL_RenderDrawPoint(renderer, x + x0, -y + y0);
+      SDL_RenderDrawPoint(renderer, x + x0, -y + y0); 
       SDL_RenderDrawPoint(renderer, y + x0, -x + y0);
 
       if (radiusError < 0)
