@@ -20,7 +20,7 @@
 
 void LoadFile(SDL_Renderer* renderer, std::vector<Shape*> &shapes, std::string filename);
 int SaveFile(std::vector<Shape*> shapes);
-float ColourValue(float v);
+float ColourValue(uint8_t v);
 
 int main(int argc, char *argv[])
 {
@@ -56,9 +56,9 @@ int main(int argc, char *argv[])
    std::string dropped_filedir;                  // Pointer for directory of dropped file
 
    //There MUST be a better way to do this.... I'm just tired
-   float slider_r = 72.0f;
-   float slider_g = 72.0f;
-   float slider_b = 72.0f;
+   uint8_t slider_r = 72.0f;
+   uint8_t slider_g = 72.0f;
+   uint8_t slider_b = 72.0f;
 
    Vec2* slider_min_r = new Vec2(SLIDER_TL_X, SLIDER_TL_Y);
    Vec2* slider_max_r = new Vec2(SLIDER_BR_X, SLIDER_BR_Y);
@@ -224,13 +224,13 @@ int main(int argc, char *argv[])
       SDL_RenderClear(renderer);
 
 
-
       //Hooray, one single loop to draw everything :o)
       if (!shapes.empty())
       {
          for (uint32_t i = 0; i < shapes.size(); ++i)
          {
-            shapes[i]->Draw(renderer, ColourValue(slider_r), ColourValue(slider_g), ColourValue(slider_b));
+            shapes[i]->Draw(renderer, ColourValue(slider_r - 72), ColourValue(slider_g - 72), ColourValue(slider_b - 72));
+            std::cout << "r: " << ColourValue(slider_r - 72) << "g: " << ColourValue(slider_g - 72) << "g: " << ColourValue(slider_b - 72) << std::endl;
          }
       }
 
@@ -350,8 +350,8 @@ int SaveFile(std::vector<Shape*> shapes)
    }
 }
 
-float ColourValue(float v)
+float ColourValue(uint8_t v)
 {
-   v = v * 0.4823529411764;
+   v = v * 2;
    return v;
 }
