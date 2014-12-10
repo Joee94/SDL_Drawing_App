@@ -24,7 +24,6 @@ bool Position::CheckPosition(SDL_Event& mouseEvent, Vec2 topleft, Vec2 bottomrig
    point->y = mouseEvent.button.y;
    if (((point->x > topleft.x) && (point->y > topleft.y)) && ((point->x < bottomright.x) && (point->y < bottomright.y)))  //Uhhh is there a better way of doing this?
    {
-      std::cout << "yes";
       return 1;
    }
    else

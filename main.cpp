@@ -41,11 +41,17 @@ int main(int argc, char *argv[])
       winWidth, winHeight,
       SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
    SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
+   SDL_Surface* screen;
 
    unsigned int lastTime = SDL_GetTicks();
    bool go = true;
 
-   Sprite* GUI = new Sprite;
+   //These could all really be on one sprite sheet... bleh maybe later
+   Sprite* Sheet = new Sprite;
+   Sprite* LineGUI      = new Sprite;
+   Sprite* RectangleGUI = new Sprite;
+   Sprite* CircleGUI    = new Sprite;
+   Sprite* CurvedGUI    = new Sprite;
    Sprite* ColourPicker = new Sprite;
    Sprite* Slider = new Sprite;
    Fill* Bucket = new Fill;
@@ -71,7 +77,11 @@ int main(int argc, char *argv[])
 
    //Loading the line by default until it's changed
 
-   GUI->LoadFromBMP("line.png", renderer);
+   Sheet->LoadFromBMP("spritesheet.png", renderer);
+   LineGUI->LoadFromBMP("line.png", renderer);
+   RectangleGUI->LoadFromBMP("rectangle.png", renderer);
+   CircleGUI->LoadFromBMP("circle.png", renderer);
+   CurvedGUI->LoadFromBMP("curved.png", renderer);
    ColourPicker->LoadFromBMP("picker.png", renderer);
    Slider->LoadFromBMP("slider.png", renderer);
    //A selector to choose which tool to use
@@ -79,26 +89,6 @@ int main(int argc, char *argv[])
    //The game loop
    while (go)
    {
-      //Selecting the correct image to load based on what is selected, seemed more efficient to load 1 image at a time rather than 4 and swapping one out each time... not sure
-      switch (selector)
-      {
-      case 0:
-         //Straight Line
-         GUI->LoadFromBMP("line.png", renderer);
-         break;
-      case 1:
-         //Rectangle
-         GUI->LoadFromBMP("rectangle.png", renderer);
-         break;
-      case 2:
-         //Circle
-         GUI->LoadFromBMP("circle.png", renderer);
-         break;
-      case 3:
-         //Curved Line
-         GUI->LoadFromBMP("curved.png", renderer);
-         break;
-      }
       SDL_Event incomingEvent;
       while (SDL_PollEvent(&incomingEvent))  //Checking which event is coming in
       {
@@ -235,16 +225,39 @@ int main(int argc, char *argv[])
          for (uint32_t i = 0; i < shapes.size(); ++i)
          {
             shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR() - 72), ColourValue(shapes[i]->GetG() - 72), ColourValue(shapes[i]->GetB() - 72));
-            std::cout << "r: " << ColourValue(slider_r - 72) << "g: " << ColourValue(slider_g - 72) << "g: " << ColourValue(slider_b - 72) << std::endl;
+
          }
       }
 
       //Drawing the GUI
-      GUI->Draw(0, 0, renderer);
       ColourPicker->Draw(50, 0, renderer);
       Slider->Draw(slider_r, 10, renderer);
       Slider->Draw(slider_g, 41, renderer);
       Slider->Draw(slider_b, 72, renderer);
+
+      switch (selector)
+      {
+      case 0:
+         LineGUI->Draw(0, 0, renderer);
+         break;
+      case 1:
+         RectangleGUI->Draw(0, 0, renderer);
+         break;
+      case 2:
+         CircleGUI->Draw(0, 0, renderer);
+         break;
+      case 3:
+      case 4:
+         CurvedGUI->Draw(0, 0, renderer);
+         break;
+
+      }
+
+      //Just a little rectangle to show what colour is selected
+      SDL_Rect colour = { 250, 0, 50, 50};
+      SDL_SetRenderDrawColor(renderer, ColourValue(slider_r - 72), ColourValue(slider_g - 72), ColourValue(slider_b - 72), 0xFF);
+      SDL_RenderFillRect(renderer, &colour);
+
 
       // This tells the renderer to actually show its contents to the screen
       // We'll get into this sort of thing at a later date - or just look up 'double buffering' if you're impatient :P
@@ -283,7 +296,6 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
       float x0, y0, x1, y1, x2, y2;   //bunch of co-ordinates
 
       linestream >> type >> x0 >> y0 >> x1 >> y1 >> x2 >> y2; //then just get the rest
-      std::cout << type << " " << x0 << " " << y0 << " " << x1 << " " << y1 << " " << x2 << " " << y2 << std::endl;    //debugging mostly
 
       //eh I couldn't do a case statement for strings, I probably shoudl just use ints.... maybe if I can be assed in the future.
       switch (type)
