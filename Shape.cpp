@@ -65,7 +65,7 @@ void Shape::Point(float p1x, float p1y, float p2x, float p2y, float p3x, float p
 }
 
 //setting some colours
-void Shape::Colour(uint8_t red, uint8_t green, uint8_t blue)
+void Shape::Colour(uint8_t &red, uint8_t &green, uint8_t &blue)
 {
    r = red;
    g = green;
@@ -91,7 +91,7 @@ Vec2 Shape::GetControlPoint()
    return (*this->controlPoint);
 }
 
-int Shape::GetShapeType()
+uint8_t Shape::GetShapeType()
 {
    return (this->shapeType);
 

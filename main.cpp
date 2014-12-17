@@ -17,10 +17,17 @@
 #include "Sprite.h"
 #include "Fill.h"
 #include "Position.h"
+#include "glew.h"
 
 void LoadFile(std::vector<Shape*> &shapes, std::string filename);
 void SaveFile(std::vector<Shape*> shapes);
 float ColourValue(uint8_t v);
+
+struct Colour{ 
+   uint8_t  red = 0;
+   uint8_t  green = 0;
+   uint8_t  blue = 0;
+};
 
 int main(int argc, char *argv[])
 {
@@ -41,10 +48,11 @@ int main(int argc, char *argv[])
       winWidth, winHeight,
       SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
    SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
-   SDL_Surface* screen;
 
    unsigned int lastTime = SDL_GetTicks();
    bool go = true;
+
+   Colour *colour = new Colour;
 
    //These could all really be on one sprite sheet... bleh maybe later
    Sprite* Sheet = new Sprite;
@@ -54,7 +62,6 @@ int main(int argc, char *argv[])
    Sprite* CurvedGUI    = new Sprite;
    Sprite* ColourPicker = new Sprite;
    Sprite* Slider = new Sprite;
-   Fill* Bucket = new Fill;
    Position* pos = new Position;
 
    //My std::vectors, may remove and try and put everything in one Shapes Vector but I'll get to that....
@@ -74,6 +81,9 @@ int main(int argc, char *argv[])
 
    Vec2* slider_min_b = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+64);
    Vec2* slider_max_b = new Vec2(SLIDER_BR_X, SLIDER_BR_Y+64);
+
+   Vec2* GUITopLeft = new Vec2(50.0f, 0);
+   Vec2* GUIBottomRight = new Vec2(250.0f, 100.0f);
 
    //Loading the line by default until it's changed
 
@@ -104,17 +114,26 @@ int main(int argc, char *argv[])
             break;
          }
          case SDL_MOUSEBUTTONDOWN:  //When the user presses the mouse button is will create a new object and add it to a vector
-            if (pos->CheckPosition(incomingEvent, *slider_min_r, *slider_max_r))
+            //currently doesn't work
+            //glReadPixels(incomingEvent.button.x, incomingEvent.button.y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, &pixel);
+            //std::cout << (int)pixel.red << " " << (int)pixel.green << " " << (int)pixel.blue << "test" << std::endl;
+            if (pos->CheckPosition(incomingEvent, *GUITopLeft, *GUIBottomRight ))
             {
-               slider_r = pos->GetPosition(incomingEvent).x;
-            }
-            else if (pos->CheckPosition(incomingEvent, *slider_min_g, *slider_max_g))
-            {
-               slider_g = pos->GetPosition(incomingEvent).x;
-            }
-            else if (pos->CheckPosition(incomingEvent, *slider_min_b, *slider_max_b))
-            {
-               slider_b = pos->GetPosition(incomingEvent).x;
+               if (pos->CheckPosition(incomingEvent, *slider_min_r, *slider_max_r))
+               {
+                  slider_r = pos->GetPosition(incomingEvent).x - 5;
+                  colour->red = slider_r - 72;
+               }
+               else if (pos->CheckPosition(incomingEvent, *slider_min_g, *slider_max_g))
+               {
+                  slider_g = pos->GetPosition(incomingEvent).x - 5;
+                  colour->green = slider_g - 72;
+               }
+               else if (pos->CheckPosition(incomingEvent, *slider_min_b, *slider_max_b))
+               {
+                  slider_b = pos->GetPosition(incomingEvent).x - 5;
+                  colour->blue = slider_b - 72;
+               }
             }
             else
             {
@@ -124,58 +143,54 @@ int main(int argc, char *argv[])
                   //Straight Line
                   shapes.push_back(new StraightLine());   //Adding to vector
                   shapes.back()->Point(incomingEvent);   //Calling the point function to start plotting the first point
-                  shapes.back()->Colour(slider_r, slider_g, slider_b);
+                  shapes.back()->Colour(colour->red, colour->green, colour->blue);
                   break;
                case 1:
                   //Rectangle
                   shapes.push_back(new Rectangle());    //etc. etc.
                   shapes.back()->Point(incomingEvent);
-                  shapes.back()->Colour(slider_r, slider_g, slider_b);
+                  shapes.back()->Colour(colour->red, colour->green, colour->blue);
                   break;
                case 2:
                   //Circle
                   shapes.push_back(new Circle());
                   shapes.back()->Point(incomingEvent);
-                  shapes.back()->Colour(slider_r, slider_g, slider_b);
+                  shapes.back()->Colour(colour->red, colour->green, colour->blue);
                   break;
                case 3:
                   //Curved Line
-                  std::cout << "point1";
                   shapes.push_back(new CurvedLine());
                   shapes.back()->Point(incomingEvent, 0);
-                  shapes.back()->Colour(slider_r, slider_g, slider_b);
-                  break;
-               case 5:
-                  //Fill
-                  SDL_Surface *surface = SDL_GetWindowSurface(window);
-                  Vec2 point = Bucket->Point(incomingEvent);
-                  std::cout << Bucket->getpixel(surface, point.x, point.y);
+                  shapes.back()->Colour(colour->red, colour->green, colour->blue);
                   break;
                }
             }
             break;
             //Bit of an issue, basically don't drag things into the top left 
          case SDL_MOUSEBUTTONUP:
-            switch (selector)
+            if (!pos->CheckPosition(incomingEvent, *GUITopLeft, *GUIBottomRight))
             {
-            case 0:
-            case 1:
-            case 2:
-               //Straight Line
-               shapes.back()->Point(incomingEvent);   //I then access the same object created before and call Point again for the second point...
-               break;
-            case 3:
-               //Curved Line
-               shapes.back()->Point(incomingEvent, 1);
-               selector = 4;
-               break;
-            case 4:
-               //Control Point of Curved Line
-               std::cout << "point3";
-               shapes.back()->Point(incomingEvent, 2);   // Or sometimes the 3rd point based on the shape
-               selector = 3;
-               break;
+               switch (selector)
+               {
+               case 0:
+               case 1:
+               case 2:
+                  //Straight Line
+                  shapes.back()->Point(incomingEvent);   //I then access the same object created before and call Point again for the second point...
+                  break;
+               case 3:
+                  //Curved Line
+                  shapes.back()->Point(incomingEvent, 1);
+                  selector = 4;
+                  break;
+               case 4:
+                  //Control Point of Curved Line
+                  std::cout << "point3";
+                  shapes.back()->Point(incomingEvent, 2);   // Or sometimes the 3rd point based on the shape
+                  selector = 3;
+                  break;
 
+               }
             }
             break;
          case SDL_KEYDOWN:
@@ -224,8 +239,7 @@ int main(int argc, char *argv[])
       {
          for (uint32_t i = 0; i < shapes.size(); ++i)
          {
-            shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR() - 72), ColourValue(shapes[i]->GetG() - 72), ColourValue(shapes[i]->GetB() - 72));
-
+            shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR()), ColourValue(shapes[i]->GetG()), ColourValue(shapes[i]->GetB()));
          }
       }
 
@@ -254,9 +268,9 @@ int main(int argc, char *argv[])
       }
 
       //Just a little rectangle to show what colour is selected
-      SDL_Rect colour = { 250, 0, 50, 50};
-      SDL_SetRenderDrawColor(renderer, ColourValue(slider_r - 72), ColourValue(slider_g - 72), ColourValue(slider_b - 72), 0xFF);
-      SDL_RenderFillRect(renderer, &colour);
+      SDL_Rect currentColour = { 250, 0, 50, 50};
+      SDL_SetRenderDrawColor(renderer, ColourValue(colour->red), ColourValue(colour->green), ColourValue(colour->blue), 0xFF);
+      SDL_RenderFillRect(renderer, &currentColour);
 
 
       // This tells the renderer to actually show its contents to the screen
@@ -294,8 +308,9 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
       std::stringstream linestream(currentLine);   //YES THERE ARE
       int type;    //The type of shape we gon' draw
       float x0, y0, x1, y1, x2, y2;   //bunch of co-ordinates
+      uint8_t r, g, b;
 
-      linestream >> type >> x0 >> y0 >> x1 >> y1 >> x2 >> y2; //then just get the rest
+      linestream >> type >> x0 >> y0 >> x1 >> y1 >> x2 >> y2 >> r >> g >> b; //then just get the rest
 
       //eh I couldn't do a case statement for strings, I probably shoudl just use ints.... maybe if I can be assed in the future.
       switch (type)
@@ -303,18 +318,22 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
       case 0:
          shapes.push_back(new StraightLine());
          shapes.back()->Point(x0, y0, x1, y1);
+         shapes.back()->Colour(r,g,b);
          break;
       case 1:
          shapes.push_back(new Rectangle());
          shapes.back()->Point(x0, y0, x1, y1);
+         shapes.back()->Colour(r, g, b);
          break;
       case 2:
          shapes.push_back(new Circle());
          shapes.back()->Point(x0, y0, x1, y1);
+         shapes.back()->Colour(r, g, b);
          break;
       case 3:
          shapes.push_back(new CurvedLine());
          shapes.back()->Point(x0, y0, x1, y1, x2, y2);
+         shapes.back()->Colour(r, g, b);
          break;
       }
       types.push_back(type);  //add it to some types array for later
@@ -342,23 +361,31 @@ void SaveFile(std::vector<Shape*> shapes)
          {
             if (shapes[i]->GetShapeType() != 3)
             {
-               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\n",      //So... this is where all the stuff is output to a text doc, issues with the control point meant
-                  shapes[i]->GetShapeType(),                   //I had to split this up into shapes with 2 points and shapes with 3... bleh I tried other methods
-                  shapes[i]->GetPoint1().x,                    //but nothing worked :( (Still shorter than my last attempt)
+               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\n",
+                  shapes[i]->GetShapeType(),
+                  shapes[i]->GetPoint1().x,
                   shapes[i]->GetPoint1().y,
                   shapes[i]->GetPoint2().x,
-                  shapes[i]->GetPoint2().y);
+                  shapes[i]->GetPoint2().y,
+                  "0",
+                  "0",
+                  shapes[i]->GetR(),
+                  shapes[i]->GetG(),
+                  shapes[i]->GetB());
             }
             else
             {
-               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\n",
+               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\n",
                   shapes[i]->GetShapeType(),
                   shapes[i]->GetPoint1().x,
                   shapes[i]->GetPoint1().y,
                   shapes[i]->GetPoint2().x,
                   shapes[i]->GetPoint2().y,
                   shapes[i]->GetControlPoint().x,
-                  shapes[i]->GetControlPoint().y);
+                  shapes[i]->GetControlPoint().y,
+                  shapes[i]->GetR(),
+                  shapes[i]->GetG(),
+                  shapes[i]->GetB());
             }
          }
       }

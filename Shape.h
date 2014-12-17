@@ -15,12 +15,12 @@ public:
    virtual void Point(SDL_Event& mouseEvent, int num);
    virtual void Point(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y);
    virtual void Draw(SDL_Renderer* renderer, float r, float g, float b);
-   virtual void Colour(uint8_t r, uint8_t g, uint8_t b);
+   virtual void Colour(uint8_t &red, uint8_t &green, uint8_t &blue);
 
    Vec2 GetPoint1();
    Vec2 GetPoint2();
    Vec2 GetControlPoint();
-   int GetShapeType();
+   uint8_t GetShapeType();
    uint8_t GetR();
    uint8_t GetG();
    uint8_t GetB();
