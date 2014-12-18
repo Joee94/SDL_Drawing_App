@@ -65,14 +65,15 @@ void Shape::Point(float p1x, float p1y, float p2x, float p2y, float p3x, float p
 }
 
 //setting some colours
-void Shape::Colour(uint8_t &red, uint8_t &green, uint8_t &blue)
+void Shape::Colour(uint8_t &red, uint8_t &green, uint8_t &blue, uint8_t &alpha)
 {
    r = red;
    g = green;
    b = blue;
+   a = alpha;
 }
 
-void Shape::Draw(SDL_Renderer* renderer, float r, float g, float b)
+void Shape::Draw(SDL_Renderer* renderer, float r, float g, float b, float a)
 {
 }
 
@@ -109,4 +110,8 @@ uint8_t Shape::GetG()
 uint8_t Shape::GetB()
 {
    return (this->b);
+}
+uint8_t Shape::GetA()
+{
+   return (this->a);
 }

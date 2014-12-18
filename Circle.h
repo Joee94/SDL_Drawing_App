@@ -9,7 +9,7 @@ public:
 	Circle();
 	~Circle();
 
-   void Draw(SDL_Renderer* renderer, float r, float g, float b);
+   void Draw(SDL_Renderer* renderer, float r, float g, float b, float a);
 
 private:
    //some private variables for working things out

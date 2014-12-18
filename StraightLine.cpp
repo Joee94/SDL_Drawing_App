@@ -15,9 +15,9 @@ StraightLine::~StraightLine()
 	delete point2;
 }
 
-void StraightLine::Draw(SDL_Renderer* renderer, float r, float g, float b)
+void StraightLine::Draw(SDL_Renderer* renderer, float r, float g, float b, float a)
 {
    //This is an easy one, set a colour and draw it, thanks to inheritance I don't have to worry about the mouseinput stuff
-	SDL_SetRenderDrawColor( renderer, r, g, b, 0xFF );
+	SDL_SetRenderDrawColor( renderer, r, g, b, a );
 	SDL_RenderDrawLine(renderer, point1->x, point1->y, point2->x, point2->y); 
 }

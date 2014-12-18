@@ -15,7 +15,7 @@ Circle::~Circle()
 	delete point2;
 }
 
-void Circle::Draw(SDL_Renderer* renderer, float r, float g, float b)
+void Circle::Draw(SDL_Renderer* renderer, float r, float g, float b, float a)
 {
    //Ok I'm not 100% sure how this works, circles are complicated
    
@@ -38,7 +38,7 @@ void Circle::Draw(SDL_Renderer* renderer, float r, float g, float b)
    std::cout << std::endl;
    #endif
 
-   SDL_SetRenderDrawColor(renderer, r, g, b, 0xFF);
+   SDL_SetRenderDrawColor(renderer, r, g, b, a);
    #pragma omp parallel for
    for (y = 0; x >= y; y++)
    {

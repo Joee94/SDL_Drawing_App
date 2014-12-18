@@ -27,6 +27,7 @@ struct Colour{
    uint8_t  red = 0;
    uint8_t  green = 0;
    uint8_t  blue = 0;
+   uint8_t  alpha = 255;
 };
 
 int main(int argc, char *argv[])
@@ -53,6 +54,7 @@ int main(int argc, char *argv[])
    bool go = true;
 
    Colour *colour = new Colour;
+   Colour *bgCol = new Colour;
 
    //These could all really be on one sprite sheet... bleh maybe later
    Sprite* Sheet = new Sprite;
@@ -62,6 +64,7 @@ int main(int argc, char *argv[])
    Sprite* CurvedGUI    = new Sprite;
    Sprite* ColourPicker = new Sprite;
    Sprite* Slider = new Sprite;
+   Sprite* Transparent = new Sprite;
    Position* pos = new Position;
 
    //My std::vectors, may remove and try and put everything in one Shapes Vector but I'll get to that....
@@ -72,6 +75,7 @@ int main(int argc, char *argv[])
    uint8_t slider_r = 72;
    uint8_t slider_g = 72;
    uint8_t slider_b = 72;
+   uint8_t slider_a = 72;
 
    Vec2* slider_min_r = new Vec2(SLIDER_TL_X, SLIDER_TL_Y);
    Vec2* slider_max_r = new Vec2(SLIDER_BR_X, SLIDER_BR_Y);
@@ -82,8 +86,11 @@ int main(int argc, char *argv[])
    Vec2* slider_min_b = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+64);
    Vec2* slider_max_b = new Vec2(SLIDER_BR_X, SLIDER_BR_Y+64);
 
+   Vec2* slider_min_a = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+96);
+   Vec2* slider_max_a = new Vec2(SLIDER_BR_X, SLIDER_BR_Y+96);
+
    Vec2* GUITopLeft = new Vec2(50.0f, 0);
-   Vec2* GUIBottomRight = new Vec2(250.0f, 100.0f);
+   Vec2* GUIBottomRight = new Vec2(250.0f, 120.0f);
 
    //Loading the line by default until it's changed
 
@@ -94,9 +101,11 @@ int main(int argc, char *argv[])
    CurvedGUI->LoadFromBMP("curved.png", renderer);
    ColourPicker->LoadFromBMP("picker.png", renderer);
    Slider->LoadFromBMP("slider.png", renderer);
+   Transparent->LoadFromBMP("transparent.png", renderer);
    //A selector to choose which tool to use
    int selector = 0;
    //The game loop
+   SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0xFF);
    while (go)
    {
       SDL_Event incomingEvent;
@@ -134,6 +143,11 @@ int main(int argc, char *argv[])
                   slider_b = pos->GetPosition(incomingEvent).x - 5;
                   colour->blue = slider_b - 72;
                }
+               else if (pos->CheckPosition(incomingEvent, *slider_min_a, *slider_max_a))
+               {
+                  slider_a = pos->GetPosition(incomingEvent).x - 5;
+                  colour->alpha = slider_a - 72;
+               }
             }
             else
             {
@@ -143,25 +157,25 @@ int main(int argc, char *argv[])
                   //Straight Line
                   shapes.push_back(new StraightLine());   //Adding to vector
                   shapes.back()->Point(incomingEvent);   //Calling the point function to start plotting the first point
-                  shapes.back()->Colour(colour->red, colour->green, colour->blue);
+                  shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
                   break;
                case 1:
                   //Rectangle
                   shapes.push_back(new Rectangle());    //etc. etc.
                   shapes.back()->Point(incomingEvent);
-                  shapes.back()->Colour(colour->red, colour->green, colour->blue);
+                  shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
                   break;
                case 2:
                   //Circle
                   shapes.push_back(new Circle());
                   shapes.back()->Point(incomingEvent);
-                  shapes.back()->Colour(colour->red, colour->green, colour->blue);
+                  shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
                   break;
                case 3:
                   //Curved Line
                   shapes.push_back(new CurvedLine());
                   shapes.back()->Point(incomingEvent, 0);
-                  shapes.back()->Colour(colour->red, colour->green, colour->blue);
+                  shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
                   break;
                }
             }
@@ -185,7 +199,6 @@ int main(int argc, char *argv[])
                   break;
                case 4:
                   //Control Point of Curved Line
-                  std::cout << "point3";
                   shapes.back()->Point(incomingEvent, 2);   // Or sometimes the 3rd point based on the shape
                   selector = 3;
                   break;
@@ -215,10 +228,19 @@ int main(int argc, char *argv[])
                break;
             case SDLK_s:
                SaveFile(shapes);
+               break;
+            case SDLK_b:
+               bgCol->red = ColourValue(colour->red);
+               bgCol->green = ColourValue(colour->green);
+               bgCol->blue = ColourValue(colour->blue);
+               bgCol->alpha = ColourValue(colour->alpha);
+               break;
             }
             break;
          }
       }
+      //Setting the alpha blendmode
+      SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 
       unsigned int current = SDL_GetTicks();
@@ -229,7 +251,7 @@ int main(int argc, char *argv[])
 
       // Start by clearing what was drawn before
       // Set the colour for drawing
-      SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0xFF);
+      SDL_SetRenderDrawColor(renderer, bgCol->red, bgCol->green, bgCol->blue, bgCol->alpha);
       // Clear the entire screen to our selected colour
       SDL_RenderClear(renderer);
 
@@ -237,9 +259,10 @@ int main(int argc, char *argv[])
       //Hooray, one single loop to draw everything :o)
       if (!shapes.empty())
       {
+         #pragma omp parallel for
          for (uint32_t i = 0; i < shapes.size(); ++i)
          {
-            shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR()), ColourValue(shapes[i]->GetG()), ColourValue(shapes[i]->GetB()));
+            shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR()), ColourValue(shapes[i]->GetG()), ColourValue(shapes[i]->GetB()), ColourValue(shapes[i]->GetA()));
          }
       }
 
@@ -248,6 +271,8 @@ int main(int argc, char *argv[])
       Slider->Draw(slider_r, 10, renderer);
       Slider->Draw(slider_g, 41, renderer);
       Slider->Draw(slider_b, 72, renderer);
+      Slider->Draw(slider_a, 103, renderer);
+      Transparent->Draw(250, 0, renderer);
 
       switch (selector)
       {
@@ -269,10 +294,10 @@ int main(int argc, char *argv[])
 
       //Just a little rectangle to show what colour is selected
       SDL_Rect currentColour = { 250, 0, 50, 50};
-      SDL_SetRenderDrawColor(renderer, ColourValue(colour->red), ColourValue(colour->green), ColourValue(colour->blue), 0xFF);
+      SDL_SetRenderDrawColor(renderer, ColourValue(colour->red), ColourValue(colour->green), ColourValue(colour->blue), ColourValue(colour->alpha));
       SDL_RenderFillRect(renderer, &currentColour);
 
-
+       
       // This tells the renderer to actually show its contents to the screen
       // We'll get into this sort of thing at a later date - or just look up 'double buffering' if you're impatient :P
       SDL_RenderPresent(renderer);
@@ -308,9 +333,9 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
       std::stringstream linestream(currentLine);   //YES THERE ARE
       int type;    //The type of shape we gon' draw
       float x0, y0, x1, y1, x2, y2;   //bunch of co-ordinates
-      uint8_t r, g, b;
+      uint8_t r, g, b, a;
 
-      linestream >> type >> x0 >> y0 >> x1 >> y1 >> x2 >> y2 >> r >> g >> b; //then just get the rest
+      linestream >> type >> x0 >> y0 >> x1 >> y1 >> x2 >> y2 >> r >> g >> b >> a; //then just get the rest
 
       //eh I couldn't do a case statement for strings, I probably shoudl just use ints.... maybe if I can be assed in the future.
       switch (type)
@@ -318,22 +343,22 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
       case 0:
          shapes.push_back(new StraightLine());
          shapes.back()->Point(x0, y0, x1, y1);
-         shapes.back()->Colour(r,g,b);
+         shapes.back()->Colour(r, g, b, a);
          break;
       case 1:
          shapes.push_back(new Rectangle());
          shapes.back()->Point(x0, y0, x1, y1);
-         shapes.back()->Colour(r, g, b);
+         shapes.back()->Colour(r, g, b, a);
          break;
       case 2:
          shapes.push_back(new Circle());
          shapes.back()->Point(x0, y0, x1, y1);
-         shapes.back()->Colour(r, g, b);
+         shapes.back()->Colour(r, g, b, a);
          break;
       case 3:
          shapes.push_back(new CurvedLine());
          shapes.back()->Point(x0, y0, x1, y1, x2, y2);
-         shapes.back()->Colour(r, g, b);
+         shapes.back()->Colour(r, g, b, a);
          break;
       }
       types.push_back(type);  //add it to some types array for later
@@ -361,7 +386,7 @@ void SaveFile(std::vector<Shape*> shapes)
          {
             if (shapes[i]->GetShapeType() != 3)
             {
-               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\n",
+               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\t%i\n",
                   shapes[i]->GetShapeType(),
                   shapes[i]->GetPoint1().x,
                   shapes[i]->GetPoint1().y,
@@ -371,11 +396,12 @@ void SaveFile(std::vector<Shape*> shapes)
                   "0",
                   shapes[i]->GetR(),
                   shapes[i]->GetG(),
-                  shapes[i]->GetB());
+                  shapes[i]->GetB(),
+                  shapes[i]->GetA());
             }
             else
             {
-               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\n",
+               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\t%i\n",
                   shapes[i]->GetShapeType(),
                   shapes[i]->GetPoint1().x,
                   shapes[i]->GetPoint1().y,
@@ -385,7 +411,8 @@ void SaveFile(std::vector<Shape*> shapes)
                   shapes[i]->GetControlPoint().y,
                   shapes[i]->GetR(),
                   shapes[i]->GetG(),
-                  shapes[i]->GetB());
+                  shapes[i]->GetB(),
+                  shapes[i]->GetA());
             }
          }
       }
