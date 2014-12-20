@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "Vec2.h"
+#include "glew.h"
 
 //This is the base Shape class that all classes will inherit
 
@@ -16,6 +17,9 @@ public:
    virtual void Point(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y);
    virtual void Draw(SDL_Renderer* renderer, float r, float g, float b, float a);
    virtual void Colour(uint8_t &red, uint8_t &green, uint8_t &blue, uint8_t &alpha);
+
+   virtual void CreateArray(SDL_Event& mouseEvent);
+   virtual void glDraw();
 
    Vec2 GetPoint1();
    Vec2 GetPoint2();
@@ -37,4 +41,7 @@ protected:
    uint8_t a;
 
    uint8_t shapeType;
+
+   GLuint vertexbuffer;
+   GLuint VAO;
 };

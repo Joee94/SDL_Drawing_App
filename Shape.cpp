@@ -77,6 +77,14 @@ void Shape::Draw(SDL_Renderer* renderer, float r, float g, float b, float a)
 {
 }
 
+void Shape::CreateArray(SDL_Event& mouseEvent)
+{
+}
+
+void Shape::glDraw()
+{
+}
+
 Vec2 Shape::GetPoint1()
 {
    return (*this->point1);

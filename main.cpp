@@ -20,7 +20,7 @@
 #include "glew.h"
 
 void LoadFile(std::vector<Shape*> &shapes, std::string filename);
-void SaveFile(std::vector<Shape*> shapes);
+void SaveFile(std::vector<Shape*> &shapes);
 float ColourValue(uint8_t v);
 
 struct Colour{ 
@@ -39,16 +39,28 @@ int main(int argc, char *argv[])
       return -1;
    }
 
+   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+   // Minor version number (3):
+   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+   // Then we say whether we want the core profile or the compatibility profile
+   // Flag options are either: SDL_GL_CONTEXT_PROFILE_CORE   or   SDL_GL_CONTEXT_PROFILE_COMPATIBILITY
+   // We'll go for the core profile
+   // This means we are using the latest version and cannot use the deprecated functions
+   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
    //Setting up the window
    int winPosX = 100;
    int winPosY = 100;
    int winWidth = 640;
    int winHeight = 480;
-   SDL_Window *window = SDL_CreateWindow("My Window!!!",  // The first parameter is the window title
+   SDL_Window *window = SDL_CreateWindow("Joes Drawing App",  // The first parameter is the window title
       winPosX, winPosY,
       winWidth, winHeight,
       SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
    SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
+   // Now that the SDL renderer is created for the window, we can create an OpenGL context for it!
+   // This will allow us to actually use OpenGL to draw to the window
+   SDL_GLContext glcontext = SDL_GL_CreateContext(window);
 
    unsigned int lastTime = SDL_GetTicks();
    bool go = true;
@@ -156,6 +168,7 @@ int main(int argc, char *argv[])
                case 0:
                   //Straight Line
                   shapes.push_back(new StraightLine());   //Adding to vector
+                  shapes.back()->CreateArray(incomingEvent);
                   shapes.back()->Point(incomingEvent);   //Calling the point function to start plotting the first point
                   shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
                   break;
@@ -262,9 +275,12 @@ int main(int argc, char *argv[])
          #pragma omp parallel for
          for (uint32_t i = 0; i < shapes.size(); ++i)
          {
-            shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR()), ColourValue(shapes[i]->GetG()), ColourValue(shapes[i]->GetB()), ColourValue(shapes[i]->GetA()));
+            shapes[i]->glDraw();
+            //shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR()), ColourValue(shapes[i]->GetG()), ColourValue(shapes[i]->GetB()), ColourValue(shapes[i]->GetA()));
          }
       }
+
+      
 
       //Drawing the GUI
       ColourPicker->Draw(50, 0, renderer);
@@ -301,6 +317,7 @@ int main(int argc, char *argv[])
       // This tells the renderer to actually show its contents to the screen
       // We'll get into this sort of thing at a later date - or just look up 'double buffering' if you're impatient :P
       SDL_RenderPresent(renderer);
+      SDL_GL_SwapWindow(window);
 
 
       // Limiter in case we're running really quick
@@ -369,7 +386,7 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
 
 }
 
-void SaveFile(std::vector<Shape*> shapes)
+void SaveFile(std::vector<Shape*> &shapes)
 {
    FILE *f;
    errno_t err;
