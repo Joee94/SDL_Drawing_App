@@ -14,12 +14,9 @@
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="CurvedLine.cpp" />
     <ClCompile Include="Fill.cpp" />
-    <ClCompile Include="LoadFile.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PixelAccess.cpp" />
     <ClCompile Include="Position.cpp" />
     <ClCompile Include="Rectangle.cpp" />
-    <ClCompile Include="SaveFile.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="StraightLine.cpp" />
@@ -28,11 +25,8 @@
     <ClInclude Include="Circle.h" />
     <ClInclude Include="CurvedLine.h" />
     <ClInclude Include="Fill.h" />
-    <ClInclude Include="LoadFile.h" />
-    <ClInclude Include="PixelAccess.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="Rectangle.h" />
-    <ClInclude Include="SaveFile.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="StraightLine.h" />

@@ -1,7 +1,7 @@
 #define SLIDER_TL_X 78
-#define SLIDER_TL_Y 13
+#define SLIDER_TL_Y 9
 #define SLIDER_BR_X 201
-#define SLIDER_BR_Y 26
+#define SLIDER_BR_Y 23
 // This is the main SDL include file
 #include <SDL.h>
 #include <SDL_Image.h>
@@ -17,7 +17,6 @@
 #include "Sprite.h"
 #include "Fill.h"
 #include "Position.h"
-#include "glew.h"
 
 void LoadFile(std::vector<Shape*> &shapes, std::string filename);
 void SaveFile(std::vector<Shape*> shapes);
@@ -80,14 +79,14 @@ int main(int argc, char *argv[])
    Vec2* slider_min_r = new Vec2(SLIDER_TL_X, SLIDER_TL_Y);
    Vec2* slider_max_r = new Vec2(SLIDER_BR_X, SLIDER_BR_Y);
 
-   Vec2* slider_min_g = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+32);
-   Vec2* slider_max_g = new Vec2(SLIDER_BR_X , SLIDER_BR_Y+32);
+   Vec2* slider_min_g = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+30);
+   Vec2* slider_max_g = new Vec2(SLIDER_BR_X , SLIDER_BR_Y+30);
 
-   Vec2* slider_min_b = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+64);
-   Vec2* slider_max_b = new Vec2(SLIDER_BR_X, SLIDER_BR_Y+64);
+   Vec2* slider_min_b = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+58);
+   Vec2* slider_max_b = new Vec2(SLIDER_BR_X, SLIDER_BR_Y+58);
 
-   Vec2* slider_min_a = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+96);
-   Vec2* slider_max_a = new Vec2(SLIDER_BR_X, SLIDER_BR_Y+96);
+   Vec2* slider_min_a = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+87);
+   Vec2* slider_max_a = new Vec2(SLIDER_BR_X, SLIDER_BR_Y+87);
 
    Vec2* GUITopLeft = new Vec2(50.0f, 0);
    Vec2* GUIBottomRight = new Vec2(250.0f, 120.0f);
@@ -268,10 +267,10 @@ int main(int argc, char *argv[])
 
       //Drawing the GUI
       ColourPicker->Draw(50, 0, renderer);
-      Slider->Draw(slider_r, 10, renderer);
-      Slider->Draw(slider_g, 41, renderer);
-      Slider->Draw(slider_b, 72, renderer);
-      Slider->Draw(slider_a, 103, renderer);
+      Slider->Draw(slider_r, 6, renderer);
+      Slider->Draw(slider_g, 36, renderer);
+      Slider->Draw(slider_b, 64, renderer);
+      Slider->Draw(slider_a, 93, renderer);
       Transparent->Draw(250, 0, renderer);
 
       switch (selector)
