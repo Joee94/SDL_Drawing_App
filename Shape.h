@@ -14,6 +14,7 @@ public:
    virtual void Point(float p1x, float p2x, float p1y, float p2y);
    virtual void Point(SDL_Event& mouseEvent, int num);
    virtual void Point(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y);
+   virtual void Point2(SDL_Event& mouseEvent);
    virtual void Draw(SDL_Renderer* renderer, float r, float g, float b, float a);
    virtual void Colour(uint8_t &red, uint8_t &green, uint8_t &blue, uint8_t &alpha);
 

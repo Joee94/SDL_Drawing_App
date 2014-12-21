@@ -22,7 +22,7 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename);
 void SaveFile(std::vector<Shape*> shapes);
 float ColourValue(uint8_t v);
 
-struct Colour{ 
+struct Colour{
    uint8_t  red = 0;
    uint8_t  green = 0;
    uint8_t  blue = 0;
@@ -57,10 +57,10 @@ int main(int argc, char *argv[])
 
    //These could all really be on one sprite sheet... bleh maybe later
    Sprite* Sheet = new Sprite;
-   Sprite* LineGUI      = new Sprite;
+   Sprite* LineGUI = new Sprite;
    Sprite* RectangleGUI = new Sprite;
-   Sprite* CircleGUI    = new Sprite;
-   Sprite* CurvedGUI    = new Sprite;
+   Sprite* CircleGUI = new Sprite;
+   Sprite* CurvedGUI = new Sprite;
    Sprite* ColourPicker = new Sprite;
    Sprite* Slider = new Sprite;
    Sprite* Transparent = new Sprite;
@@ -79,17 +79,19 @@ int main(int argc, char *argv[])
    Vec2* slider_min_r = new Vec2(SLIDER_TL_X, SLIDER_TL_Y);
    Vec2* slider_max_r = new Vec2(SLIDER_BR_X, SLIDER_BR_Y);
 
-   Vec2* slider_min_g = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+30);
-   Vec2* slider_max_g = new Vec2(SLIDER_BR_X , SLIDER_BR_Y+30);
+   Vec2* slider_min_g = new Vec2(SLIDER_TL_X, SLIDER_TL_Y + 30);
+   Vec2* slider_max_g = new Vec2(SLIDER_BR_X, SLIDER_BR_Y + 30);
 
-   Vec2* slider_min_b = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+58);
-   Vec2* slider_max_b = new Vec2(SLIDER_BR_X, SLIDER_BR_Y+58);
+   Vec2* slider_min_b = new Vec2(SLIDER_TL_X, SLIDER_TL_Y + 58);
+   Vec2* slider_max_b = new Vec2(SLIDER_BR_X, SLIDER_BR_Y + 58);
 
-   Vec2* slider_min_a = new Vec2(SLIDER_TL_X, SLIDER_TL_Y+87);
-   Vec2* slider_max_a = new Vec2(SLIDER_BR_X, SLIDER_BR_Y+87);
+   Vec2* slider_min_a = new Vec2(SLIDER_TL_X, SLIDER_TL_Y + 87);
+   Vec2* slider_max_a = new Vec2(SLIDER_BR_X, SLIDER_BR_Y + 87);
 
    Vec2* GUITopLeft = new Vec2(50.0f, 0);
    Vec2* GUIBottomRight = new Vec2(250.0f, 120.0f);
+
+   Vec2* toolPicker = new Vec2(50.0f, 200.0f);
 
    //Loading the line by default until it's changed
 
@@ -125,7 +127,7 @@ int main(int argc, char *argv[])
             //currently doesn't work
             //glReadPixels(incomingEvent.button.x, incomingEvent.button.y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, &pixel);
             //std::cout << (int)pixel.red << " " << (int)pixel.green << " " << (int)pixel.blue << "test" << std::endl;
-            if (pos->CheckPosition(incomingEvent, *GUITopLeft, *GUIBottomRight ))
+            if (pos->CheckPosition(incomingEvent, *GUITopLeft, *GUIBottomRight))
             {
                if (pos->CheckPosition(incomingEvent, *slider_min_r, *slider_max_r))
                {
@@ -146,6 +148,25 @@ int main(int argc, char *argv[])
                {
                   slider_a = pos->GetPosition(incomingEvent).x - 5;
                   colour->alpha = slider_a - 72;
+               }
+            }
+            if (pos->CheckPosition(incomingEvent, 0, *toolPicker))
+            {
+               if (pos->CheckPosition(incomingEvent, 0, 50))
+               {
+                  selector = 0;
+               }
+               else if (pos->CheckPosition(incomingEvent, Vec2(0, 50), Vec2(50, 100)))
+               {
+                  selector = 1;
+               }
+               else if (pos->CheckPosition(incomingEvent, Vec2(0, 100), Vec2(50, 150)))
+               {
+                  selector = 2;
+               }
+               else if (pos->CheckPosition(incomingEvent, Vec2(0, 150), Vec2(50, 200)))
+               {
+                  selector = 3;
                }
             }
             else
@@ -176,6 +197,7 @@ int main(int argc, char *argv[])
                   shapes.back()->Point(incomingEvent, 0);
                   shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
                   break;
+
                }
             }
             break;
@@ -183,25 +205,27 @@ int main(int argc, char *argv[])
          case SDL_MOUSEBUTTONUP:
             if (!pos->CheckPosition(incomingEvent, *GUITopLeft, *GUIBottomRight))
             {
-               switch (selector)
+               if (!pos->CheckPosition(incomingEvent, 0, *toolPicker))
                {
-               case 0:
-               case 1:
-               case 2:
-                  //Straight Line
-                  shapes.back()->Point(incomingEvent);   //I then access the same object created before and call Point again for the second point...
-                  break;
-               case 3:
-                  //Curved Line
-                  shapes.back()->Point(incomingEvent, 1);
-                  selector = 4;
-                  break;
-               case 4:
-                  //Control Point of Curved Line
-                  shapes.back()->Point(incomingEvent, 2);   // Or sometimes the 3rd point based on the shape
-                  selector = 3;
-                  break;
-
+                  switch (selector)
+                  {
+                  case 0:
+                  case 1:
+                  case 2:
+                     //Straight Line
+                     shapes.back()->Point(incomingEvent);   //I then access the same object created before and call Point again for the second point...
+                     break;
+                  case 3:
+                     //Curved Line
+                     shapes.back()->Point(incomingEvent, 1);
+                     selector = 4;
+                     break;
+                  case 4:
+                     //Control Point of Curved Line
+                     shapes.back()->Point(incomingEvent, 2);   // Or sometimes the 3rd point based on the shape
+                     selector = 3;
+                     break;
+                  }
                }
             }
             break;
@@ -258,7 +282,7 @@ int main(int argc, char *argv[])
       //Hooray, one single loop to draw everything :o)
       if (!shapes.empty())
       {
-         #pragma omp parallel for
+#pragma omp parallel for
          for (uint32_t i = 0; i < shapes.size(); ++i)
          {
             shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR()), ColourValue(shapes[i]->GetG()), ColourValue(shapes[i]->GetB()), ColourValue(shapes[i]->GetA()));
@@ -292,11 +316,11 @@ int main(int argc, char *argv[])
       }
 
       //Just a little rectangle to show what colour is selected
-      SDL_Rect currentColour = { 250, 0, 50, 50};
+      SDL_Rect currentColour = { 250, 0, 50, 50 };
       SDL_SetRenderDrawColor(renderer, ColourValue(colour->red), ColourValue(colour->green), ColourValue(colour->blue), ColourValue(colour->alpha));
       SDL_RenderFillRect(renderer, &currentColour);
 
-       
+
       // This tells the renderer to actually show its contents to the screen
       // We'll get into this sort of thing at a later date - or just look up 'double buffering' if you're impatient :P
       SDL_RenderPresent(renderer);

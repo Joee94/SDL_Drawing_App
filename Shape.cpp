@@ -64,6 +64,19 @@ void Shape::Point(float p1x, float p1y, float p2x, float p2y, float p3x, float p
    controlPoint->y = p3y;
 }
 
+void Shape::Point2(SDL_Event& mouseEvent)
+{
+   switch (mouseEvent.type)
+   {
+   case SDL_MOUSEBUTTONUP:
+      std::cout << "test";
+      point2->x = mouseEvent.button.x;
+      point2->y = mouseEvent.button.y;
+      break;
+   }
+
+}
+
 //setting some colours
 void Shape::Colour(uint8_t &red, uint8_t &green, uint8_t &blue, uint8_t &alpha)
 {
