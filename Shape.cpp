@@ -17,7 +17,6 @@ void Shape::Point(SDL_Event& mouseEvent)
       point2->x = mouseEvent.button.x;
       point2->y = mouseEvent.button.y;
       break;
-
    }
 }
 
@@ -28,6 +27,29 @@ void Shape::Point(float p1x, float p1y, float p2x, float p2y)
    point2->x = p2x;
    point2->y = p2y;
 }
+
+void Shape::Point(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y)
+{
+   point1->x = p1x;
+   point1->y = p1y;
+   point2->x = p2x;
+   point2->y = p2y;
+   controlPoint->x = p3x;
+   controlPoint->y = p3y;
+}
+
+void Shape::Point(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y)
+{
+   point1->x = p1x;
+   point1->y = p1y;
+   point2->x = p2x;
+   point2->y = p2y;
+   controlPoint->x = p3x;
+   controlPoint->y = p3y;
+   controlPoint2->x = p4x;
+   controlPoint2->y = p4y;
+}
+
 
 void Shape::Point(SDL_Event& mouseEvent, int num)
 {
@@ -42,6 +64,8 @@ void Shape::Point(SDL_Event& mouseEvent, int num)
       point2->y = mouseEvent.button.y;
       controlPoint->x = mouseEvent.button.x;
       controlPoint->y = mouseEvent.button.y;
+      controlPoint2->x = mouseEvent.button.x;
+      controlPoint2->y = mouseEvent.button.y;
       break;
    case 1:
       point2->x = mouseEvent.button.x;
@@ -51,32 +75,12 @@ void Shape::Point(SDL_Event& mouseEvent, int num)
       controlPoint->x = mouseEvent.button.x;
       controlPoint->y = mouseEvent.button.y;
       break;
-   }
-}
-
-void Shape::Point(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y)
-{
-   point1->x = p1x;
-   point1->y = p1y;
-   point2->x = p2x;
-   point2->y = p2y;
-   controlPoint->x = p3x;
-   controlPoint->y = p3y;
-}
-
-void Shape::Point2(SDL_Event& mouseEvent)
-{
-   switch (mouseEvent.type)
-   {
-   case SDL_MOUSEBUTTONUP:
-      std::cout << "test";
-      point2->x = mouseEvent.button.x;
-      point2->y = mouseEvent.button.y;
+   case 3:
+      controlPoint2->x = mouseEvent.button.x;
+      controlPoint2->y = mouseEvent.button.y;
       break;
    }
-
 }
-
 //setting some colours
 void Shape::Colour(uint8_t &red, uint8_t &green, uint8_t &blue, uint8_t &alpha)
 {
@@ -103,6 +107,11 @@ Vec2 Shape::GetPoint2()
 Vec2 Shape::GetControlPoint()
 {
    return (*this->controlPoint);
+}
+
+Vec2 Shape::GetControlPoint2()
+{
+   return (*this->controlPoint2);
 }
 
 uint8_t Shape::GetShapeType()

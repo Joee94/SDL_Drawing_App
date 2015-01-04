@@ -10,10 +10,12 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <thread>
 #include "StraightLine.h"
 #include "Rectangle.h"
 #include "Circle.h"
 #include "CurvedLine.h"
+#include "CurvedLine2.h"
 #include "Sprite.h"
 #include "Fill.h"
 #include "Position.h"
@@ -61,6 +63,7 @@ int main(int argc, char *argv[])
    Sprite* RectangleGUI = new Sprite;
    Sprite* CircleGUI = new Sprite;
    Sprite* CurvedGUI = new Sprite;
+   Sprite* Curved2GUI = new Sprite;
    Sprite* ColourPicker = new Sprite;
    Sprite* Slider = new Sprite;
    Sprite* Transparent = new Sprite;
@@ -91,7 +94,7 @@ int main(int argc, char *argv[])
    Vec2* GUITopLeft = new Vec2(50.0f, 0);
    Vec2* GUIBottomRight = new Vec2(250.0f, 120.0f);
 
-   Vec2* toolPicker = new Vec2(50.0f, 200.0f);
+   Vec2* toolPicker = new Vec2(50.0f, 250.0f);
 
    //Loading the line by default until it's changed
 
@@ -100,6 +103,7 @@ int main(int argc, char *argv[])
    RectangleGUI->LoadFromBMP("rectangle.png", renderer);
    CircleGUI->LoadFromBMP("circle.png", renderer);
    CurvedGUI->LoadFromBMP("curved.png", renderer);
+   Curved2GUI->LoadFromBMP("cubecurve.png", renderer);
    ColourPicker->LoadFromBMP("picker.png", renderer);
    Slider->LoadFromBMP("slider.png", renderer);
    Transparent->LoadFromBMP("transparent.png", renderer);
@@ -120,7 +124,9 @@ int main(int argc, char *argv[])
          case SDL_DROPFILE:
          {
             dropped_filedir = incomingEvent.drop.file;
+            //std::thread f(LoadFile, shapes, dropped_filedir);#
             LoadFile(shapes, dropped_filedir);
+            //f.detach();
             break;
          }
          case SDL_MOUSEBUTTONDOWN:  //When the user presses the mouse button is will create a new object and add it to a vector
@@ -168,6 +174,10 @@ int main(int argc, char *argv[])
                {
                   selector = 3;
                }
+               else if (pos->CheckPosition(incomingEvent, Vec2(0, 200), Vec2(50, 250)))
+               {
+                  selector = 3;
+               }
             }
             else
             {
@@ -197,11 +207,16 @@ int main(int argc, char *argv[])
                   shapes.back()->Point(incomingEvent, 0);
                   shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
                   break;
+               case 5:
+                  //Curved Line 2
+                  shapes.push_back(new CurvedLine2());
+                  shapes.back()->Point(incomingEvent, 0);
+                  shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
+                  break;
 
                }
             }
             break;
-            //Bit of an issue, basically don't drag things into the top left 
          case SDL_MOUSEBUTTONUP:
             if (!pos->CheckPosition(incomingEvent, *GUITopLeft, *GUIBottomRight))
             {
@@ -224,6 +239,22 @@ int main(int argc, char *argv[])
                      //Control Point of Curved Line
                      shapes.back()->Point(incomingEvent, 2);   // Or sometimes the 3rd point based on the shape
                      selector = 3;
+                     break;
+
+                  case 5:
+                     //Curved Line 2
+                     shapes.back()->Point(incomingEvent, 1);  
+                     selector = 6;
+                     break;
+                  case 6:
+                     //Control Point 1 Curved Line 2
+                     shapes.back()->Point(incomingEvent, 2);  
+                     selector = 7;
+                     break;
+                  case 7:
+                     //Control Point 2 of Curved Line 2
+                     shapes.back()->Point(incomingEvent, 3);  
+                     selector = 5;
                      break;
                   }
                }
@@ -282,7 +313,7 @@ int main(int argc, char *argv[])
       //Hooray, one single loop to draw everything :o)
       if (!shapes.empty())
       {
-#pragma omp parallel for
+         #pragma omp parallel for
          for (uint32_t i = 0; i < shapes.size(); ++i)
          {
             shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR()), ColourValue(shapes[i]->GetG()), ColourValue(shapes[i]->GetB()), ColourValue(shapes[i]->GetA()));
@@ -311,6 +342,11 @@ int main(int argc, char *argv[])
       case 3:
       case 4:
          CurvedGUI->Draw(0, 0, renderer);
+         break;
+      case 5:
+      case 6:
+      case 7:
+         Curved2GUI->Draw(0, 0, renderer);
          break;
 
       }
@@ -355,10 +391,10 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
    {
       std::stringstream linestream(currentLine);   //YES THERE ARE
       int type;    //The type of shape we gon' draw
-      float x0, y0, x1, y1, x2, y2;   //bunch of co-ordinates
+      float x0, y0, x1, y1, x2, y2, x3, y3;   //bunch of co-ordinates
       uint8_t r, g, b, a;
 
-      linestream >> type >> x0 >> y0 >> x1 >> y1 >> x2 >> y2 >> r >> g >> b >> a; //then just get the rest
+      linestream >> type >> x0 >> y0 >> x1 >> y1 >> x2 >> y2 >> x3 >> y3 >> r >> g >> b >> a; //then just get the rest
 
       //eh I couldn't do a case statement for strings, I probably shoudl just use ints.... maybe if I can be assed in the future.
       switch (type)
@@ -381,6 +417,11 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
       case 3:
          shapes.push_back(new CurvedLine());
          shapes.back()->Point(x0, y0, x1, y1, x2, y2);
+         shapes.back()->Colour(r, g, b, a);
+         break;
+      case 4:
+         shapes.push_back(new CurvedLine2());
+         shapes.back()->Point(x0, y0, x1, y1, x2, y2, x3, y3);
          shapes.back()->Colour(r, g, b, a);
          break;
       }
@@ -407,22 +448,20 @@ void SaveFile(std::vector<Shape*> shapes)
       {
          for (uint32_t i = 0; i < shapes.size(); ++i)
          {
-            if (shapes[i]->GetShapeType() != 3)
+            if (shapes[i]->GetShapeType() < 3)
             {
-               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\t%i\n",
+               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%i\t%i\t%i\t%i\n",
                   shapes[i]->GetShapeType(),
                   shapes[i]->GetPoint1().x,
                   shapes[i]->GetPoint1().y,
                   shapes[i]->GetPoint2().x,
                   shapes[i]->GetPoint2().y,
-                  "0",
-                  "0",
                   shapes[i]->GetR(),
                   shapes[i]->GetG(),
                   shapes[i]->GetB(),
                   shapes[i]->GetA());
             }
-            else
+            else if (shapes[i]->GetShapeType() == 3)
             {
                fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\t%i\n",
                   shapes[i]->GetShapeType(),
@@ -432,6 +471,23 @@ void SaveFile(std::vector<Shape*> shapes)
                   shapes[i]->GetPoint2().y,
                   shapes[i]->GetControlPoint().x,
                   shapes[i]->GetControlPoint().y,
+                  shapes[i]->GetR(),
+                  shapes[i]->GetG(),
+                  shapes[i]->GetB(),
+                  shapes[i]->GetA());
+            }
+            else
+            {
+               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\t%i\n",
+                  shapes[i]->GetShapeType(),
+                  shapes[i]->GetPoint1().x,
+                  shapes[i]->GetPoint1().y,
+                  shapes[i]->GetPoint2().x,
+                  shapes[i]->GetPoint2().y,
+                  shapes[i]->GetControlPoint().x,
+                  shapes[i]->GetControlPoint().y,
+                  shapes[i]->GetControlPoint2().x,
+                  shapes[i]->GetControlPoint2().y,
                   shapes[i]->GetR(),
                   shapes[i]->GetG(),
                   shapes[i]->GetB(),

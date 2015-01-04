@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="CurvedLine.cpp" />
+    <ClCompile Include="CurvedLine2.cpp" />
     <ClCompile Include="Fill.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Position.cpp" />
@@ -24,6 +25,7 @@
   <ItemGroup>
     <ClInclude Include="Circle.h" />
     <ClInclude Include="CurvedLine.h" />
+    <ClInclude Include="CurvedLine2.h" />
     <ClInclude Include="Fill.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="Rectangle.h" />
