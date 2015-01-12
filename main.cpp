@@ -107,6 +107,8 @@ int main(int argc, char *argv[])
    ColourPicker->LoadFromBMP("picker.png", renderer);
    Slider->LoadFromBMP("slider.png", renderer);
    Transparent->LoadFromBMP("transparent.png", renderer);
+
+   SDL_Surface *sshot;
    //A selector to choose which tool to use
    int selector = 0;
    //The game loop
@@ -240,7 +242,6 @@ int main(int argc, char *argv[])
                      shapes.back()->Point(incomingEvent, 2);   // Or sometimes the 3rd point based on the shape
                      selector = 3;
                      break;
-
                   case 5:
                      //Curved Line 2
                      shapes.back()->Point(incomingEvent, 1);  
@@ -282,12 +283,21 @@ int main(int argc, char *argv[])
                break;
             case SDLK_s:
                SaveFile(shapes);
+               SDL_GetRendererOutputSize(renderer, &winWidth, &winHeight);
+               sshot = SDL_CreateRGBSurface(0, winWidth, winHeight, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+               SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
+               SDL_SaveBMP(sshot, "screenshot.bmp");
+               SDL_FreeSurface(sshot);
                break;
             case SDLK_b:
                bgCol->red = ColourValue(colour->red);
                bgCol->green = ColourValue(colour->green);
                bgCol->blue = ColourValue(colour->blue);
                bgCol->alpha = ColourValue(colour->alpha);
+               break;
+            case SDLK_z:
+               if (!shapes.empty())
+               shapes.pop_back();
                break;
             }
             break;

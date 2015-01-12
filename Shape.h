@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "Vec2.h"
+#define PI 3.14159265359
 
 //This is the base Shape class that all classes will inherit
 
