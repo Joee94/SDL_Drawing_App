@@ -26,9 +26,4 @@ protected:
 	SDL_Texture *_texture;
 
 };
-
-
-
-
-
 #endif

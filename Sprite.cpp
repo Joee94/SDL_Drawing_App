@@ -35,7 +35,7 @@ bool Sprite::LoadFromBMP( std::string filename, SDL_Renderer *renderer )
 	if( !image )
 	{
 		// We'll do a quick check here because it's easy to get filenames or directories wrong
-		std::cerr<<"ERROR: Sprite::LoadFromBMP - Oh dear, sorry but I can't find your image file. This brings me great sadness :("<<std::endl;
+		std::cerr<<"ERROR: Sprite::LoadFromBMP - Oh dear, sorry but I can't find your image file. This brings me great sadness :( "<< filename <<std::endl;
 		return false;
 	}
 
