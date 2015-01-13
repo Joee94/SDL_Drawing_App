@@ -16,6 +16,7 @@
 #include "Circle.h"
 #include "CurvedLine.h"
 #include "CurvedLine2.h"
+#include "Triangle.h"
 #include "Sprite.h"
 #include "Fill.h"
 #include "Position.h"
@@ -265,6 +266,23 @@ int main(int argc, char *argv[])
 							shapes.back()->Point(incomingEvent, 3);
 							selector = 5;
 							break;
+						case 8:
+							//Curved Line 2
+							shapes.push_back(new Triangle());
+							shapes.back()->Point(incomingEvent, 0);
+							shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
+							selector = 9;
+							break;
+						case 9:
+							//Control Point 2 of Curved Line 2
+							shapes.back()->Point(incomingEvent, 1);
+							selector = 10;
+							break;
+						case 10:
+							//Control Point 2 of Curved Line 2
+							shapes.back()->Point(incomingEvent, 2);
+							selector = 8;
+							break;
 						}
 					}
 				}
@@ -292,6 +310,10 @@ int main(int argc, char *argv[])
 				//Cubic Curve
 				case SDLK_5:
 					selector = 5;
+					break;
+				//Triangle
+				case SDLK_6:
+					selector = 8;
 					break;
 				//Save File
 				case SDLK_s:
@@ -435,6 +457,7 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
 		r = r0;
 		g = g0;
 		b = b0;
+		a = a0;
 		//eh I couldn't do a case statement for strings, I probably shoudl just use ints.... maybe if I can be assed in the future.
 		switch (type)
 		{
@@ -461,6 +484,11 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
 		case 4:
 			shapes.push_back(new CurvedLine2());
 			shapes.back()->Point(x0, y0, x1, y1, x2, y2, x3, y3);
+			shapes.back()->Colour(r, g, b, a);
+			break;
+		case 5:
+			shapes.push_back(new Triangle());
+			shapes.back()->Point(x0, y0, x1, y1, x2, y2);
 			shapes.back()->Colour(r, g, b, a);
 			break;
 		}
@@ -504,7 +532,7 @@ void SaveFile(std::vector<Shape*> shapes)
 						shapes[i]->GetB(),
 						shapes[i]->GetA());
 				}
-				else if (shapes[i]->GetShapeType() == 3)
+				else if (shapes[i]->GetShapeType() == 3 || shapes[i]->GetShapeType() == 5)
 				{
 					//saving Quadratic curves
 					fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\t%i\n",

@@ -65,13 +65,3 @@ Vec2 CurvedLine2::CubicBezierSample(Vec2 a, Vec2 b, Vec2 control, Vec2 control2,
    //     (1-t^3)P0                              + 3(1-t)^2P1                             + 3(1-t)t^2P2                    + t^3P3
    return (((1.0f - t)*(1.0f - t)*(1.0f - t))*a) + (3.0f*(1.0f - t)*(1.0f - t)*t*control) + (3.0f*(1.0f - t)*t*t*control2) + (t*t*t*b);
 }
-
-Vec2 CurvedLine2::GetControlPoint()
-{
-   return (*this->controlPoint2);
-}
-
-Vec2 CurvedLine2::GetControlPoint2()
-{
-   return (*this->controlPoint2);
-}

@@ -5,7 +5,7 @@ Rectangle::Rectangle()
    //Create some points...
 	point1 = new Vec2();
 	point2 = new Vec2();
-   shapeType = 1;
+	shapeType = 1;
 }
 
 Rectangle::~Rectangle()
