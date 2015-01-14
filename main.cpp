@@ -24,6 +24,7 @@
 void LoadFile(std::vector<Shape*> &shapes, std::string filename);
 void SaveFile(std::vector<Shape*> shapes);
 float ColourValue(uint8_t v);
+unsigned int getpixel(SDL_Surface *s, int x, int y);
 
 struct Colour
 {
@@ -32,6 +33,7 @@ struct Colour
 	uint8_t  blue = 0;
 	uint8_t  alpha = 255;
 };
+SDL_Texture *t;
 
 int main(int argc, char *argv[])
 {
@@ -108,7 +110,7 @@ int main(int argc, char *argv[])
 	Slider->LoadFromBMP("slider.png", renderer);
 	Transparent->LoadFromBMP("transparent.png", renderer);
 
-	SDL_Surface *sshot;
+   SDL_Surface *sshot;
 	//A selector to choose which tool to use
 	int selector = 0;
 	//The game loop
@@ -224,6 +226,18 @@ int main(int argc, char *argv[])
 						shapes.back()->Point(incomingEvent, 0);
 						shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
 						break;
+               case 11:
+                  //Finally discovered how to access a pixels fill colour, credit to http://sdl.5483.n7.nabble.com/Getting-pixel-color-value-at-x-y-from-an-SDL-Surface-td20671.html
+                  // for the function and to http://www.gamedev.net/topic/291015-cannot-convert-from-uint32-to-sdl_color/ for converting from a Uint32 to a colour
+                  sshot = SDL_CreateRGBSurface(0, winWidth, winHeight, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+                  SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
+                  Uint8 red, green, blue, alpha;
+                  std::cout << getpixel(sshot, incomingEvent.button.x, incomingEvent.button.y) << std::endl;
+                  SDL_GetRGBA(getpixel(sshot, incomingEvent.button.x, incomingEvent.button.y), sshot->format, &red, &green, &blue, &alpha);
+                  //For some reason it prints in Unicode so wcout fixes that
+                  std::wcout << red << std::endl;
+                  std::wcout << green << std::endl;
+                  std::wcout << blue << std::endl;
 
 					}
 				}
@@ -267,19 +281,19 @@ int main(int argc, char *argv[])
 							selector = 5;
 							break;
 						case 8:
-							//Curved Line 2
+							//Triangle
 							shapes.push_back(new Triangle());
 							shapes.back()->Point(incomingEvent, 0);
 							shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
 							selector = 9;
 							break;
 						case 9:
-							//Control Point 2 of Curved Line 2
+							//Corner 1 of triangle
 							shapes.back()->Point(incomingEvent, 1);
 							selector = 10;
 							break;
 						case 10:
-							//Control Point 2 of Curved Line 2
+							//Corner 2 of triangle
 							shapes.back()->Point(incomingEvent, 2);
 							selector = 8;
 							break;
@@ -313,7 +327,11 @@ int main(int argc, char *argv[])
 					break;
 				//Triangle
 				case SDLK_6:
-					selector = 8;
+               selector = 8;
+               break;
+               //Colour picker
+            case SDLK_7:
+               selector = 11;
 					break;
 				//Save File
 				case SDLK_s:
@@ -577,4 +595,9 @@ float ColourValue(uint8_t v)
 {
 	v *= 2;
 	return v;
+}
+
+unsigned int getpixel(SDL_Surface *s, int x, int y) 
+{
+   return ((unsigned int*)s->pixels)[y*(s->pitch / sizeof(unsigned int)) + x];
 }
