@@ -41,35 +41,28 @@ void Circle::Draw(SDL_Renderer* renderer, float r, float g, float b, float a)
    SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
 
-	   for (float angle = -PI; angle <= PI; angle += 0.1)
-	   {
-		   Vec2 p(cos(angle), sin(angle));
-		   SDL_RenderDrawPoint(renderer, p.x / 2, p.y/2);
-	   }
-
-
-  //#pragma omp parallel for
-  //for (y = 0; x >= y; y++)
-  //{
-  //   //Yeah I'm not gunna lie I'm not sure what's going on here... just drawing a buncha points
-  //   SDL_RenderDrawPoint(renderer, x + x0, y + y0);		//Completely and utterly stolen from http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
-  //   SDL_RenderDrawPoint(renderer, y + x0, x + y0);
-  //   SDL_RenderDrawPoint(renderer, -x + x0, y + y0);
-  //   SDL_RenderDrawPoint(renderer, -y + x0, x + y0);
-  //   SDL_RenderDrawPoint(renderer, -x + x0, -y + y0);
-  //   SDL_RenderDrawPoint(renderer, -y + x0, -x + y0);
-  //   SDL_RenderDrawPoint(renderer, x + x0, -y + y0); 
-  //   SDL_RenderDrawPoint(renderer, y + x0, -x + y0);
-  //
-  //   if (radiusError < 0)
-  //   {
-  //      radiusError += 2 * y + 1;
-  //   }
-  //   else
-  //   {
-  //      x--;
-  //      radiusError += 2 * (y - x + 1);
-  //   }
-  //}
+  #pragma omp parallel for
+  for (y = 0; x >= y; y++)
+  {
+     //Yeah I'm not gunna lie I'm not sure what's going on here... just drawing a buncha points
+     SDL_RenderDrawPoint(renderer, x + x0, y + y0);		//Completely and utterly stolen from http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+     SDL_RenderDrawPoint(renderer, y + x0, x + y0);
+     SDL_RenderDrawPoint(renderer, -x + x0, y + y0);
+     SDL_RenderDrawPoint(renderer, -y + x0, x + y0);
+     SDL_RenderDrawPoint(renderer, -x + x0, -y + y0);
+     SDL_RenderDrawPoint(renderer, -y + x0, -x + y0);
+     SDL_RenderDrawPoint(renderer, x + x0, -y + y0); 
+     SDL_RenderDrawPoint(renderer, y + x0, -x + y0);
+  
+     if (radiusError < 0)
+     {
+        radiusError += 2 * y + 1;
+     }
+     else
+     {
+        x--;
+        radiusError += 2 * (y - x + 1);
+     }
+  }
 
 }

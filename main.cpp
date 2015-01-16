@@ -11,6 +11,7 @@
 #include <vector>
 #include <sstream>
 #include <thread>
+#include <queue>
 #include "StraightLine.h"
 #include "Rectangle.h"
 #include "Circle.h"
@@ -25,6 +26,10 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename);
 void SaveFile(std::vector<Shape*> shapes);
 float ColourValue(uint8_t v);
 unsigned int getpixel(SDL_Surface *s, int x, int y);
+void fill(SDL_Surface *s, SDL_Renderer * renderer, Vec2 pos, unsigned int newColour, unsigned int oldColour);
+bool checkPixelProcessed(Vec2& n);
+
+std::vector<Vec2> points;
 
 struct Colour
 {
@@ -49,7 +54,7 @@ int main(int argc, char *argv[])
 	int winPosY = 100;
 	int winWidth = 640;
 	int winHeight = 480;
-	SDL_Window *window = SDL_CreateWindow("My Window!!!",  // The first parameter is the window title
+	SDL_Window *window = SDL_CreateWindow("MSPaint",  // The first parameter is the window title
 		winPosX, winPosY,
 		winWidth, winHeight,
 		SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
@@ -110,7 +115,7 @@ int main(int argc, char *argv[])
 	Slider->LoadFromBMP("slider.png", renderer);
 	Transparent->LoadFromBMP("transparent.png", renderer);
 
-   SDL_Surface *sshot;
+	SDL_Surface *sshot;
 	//A selector to choose which tool to use
 	int selector = 0;
 	//The game loop
@@ -139,6 +144,8 @@ int main(int argc, char *argv[])
 				//std::cout << (int)pixel.red << " " << (int)pixel.green << " " << (int)pixel.blue << "test" << std::endl;
 
 				//This horrible bit of code checks if you're clicking a slider.
+				std::cout << incomingEvent.button.x << std::endl;
+				std::cout << incomingEvent.button.y << std::endl;
 				if (pos->CheckPosition(incomingEvent, *GUITopLeft, *GUIBottomRight))
 				{
 					if (pos->CheckPosition(incomingEvent, *slider_min_r, *slider_max_r))
@@ -238,7 +245,7 @@ int main(int argc, char *argv[])
                   std::wcout << red << std::endl;
                   std::wcout << green << std::endl;
                   std::wcout << blue << std::endl;
-
+				  fill(sshot, renderer, Vec2((int)incomingEvent.button.x, (int)incomingEvent.button.y), getpixel(sshot, 275, 25), getpixel(sshot, incomingEvent.button.x, incomingEvent.button.y));
 					}
 				}
 				break;
@@ -364,8 +371,8 @@ int main(int argc, char *argv[])
 					break;
 				}
 				break;
-			}
-		}
+			}//Switch Incoming Event end
+		}//While Incoming Event end
 		//Setting the alpha blendmode
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
@@ -390,6 +397,15 @@ int main(int argc, char *argv[])
 			for (int i = 0; i < shapes.size(); ++i)
 			{
 				shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR()), ColourValue(shapes[i]->GetG()), ColourValue(shapes[i]->GetB()), ColourValue(shapes[i]->GetA()));
+			}
+		}
+
+		if (!points.empty())
+		{
+			for (int i = 0; i < points.size(); ++i)
+			{
+				SDL_RenderDrawPoint(renderer, points[i].x, points[i].y);
+				//std::cout << "x: " << points[i].x << "  y: " << points[i].y<<std::endl;
 			}
 		}
 
@@ -442,7 +458,7 @@ int main(int argc, char *argv[])
 			SDL_Delay((unsigned int)(((1.0f / 50.0f) - deltaTs)*1000.0f));
 		}
 
-	}
+	}//Loop end
 	// If we get outside the main game loop, it means our user has requested we exit
 
 
@@ -600,4 +616,80 @@ float ColourValue(uint8_t v)
 unsigned int getpixel(SDL_Surface *s, int x, int y) 
 {
    return ((unsigned int*)s->pixels)[y*(s->pitch / sizeof(unsigned int)) + x];
+}
+
+//void fill(SDL_Surface *s, SDL_Renderer * renderer, unsigned int newcolour, unsigned int oldcolour, Vec2 pos)
+//{
+//	Uint8 r, g, b, a;
+//	newcolour = getpixel(s, 275, 25);
+//	SDL_GetRGBA(getpixel(s, 275, 25), s->format, &r, &g, &b, &a);
+//
+//	 if (x >= 0 && x < 640 && y >= 0 && y < 480 && getpixel(s, x, y) == oldcolour && getpixel(s, x, y) != newcolour)
+//	 {
+//		SDL_SetRenderDrawColor(renderer, r, g, b, a);
+//
+//		fill(s, renderer, newcolour, oldcolour, Vec2(x + 1, y));
+//		fill(s, renderer, newcolour, oldcolour, Vec2(x - 1, y));
+//		fill(s, renderer, newcolour, oldcolour, Vec2(x, y + 1));
+//		fill(s, renderer, newcolour, oldcolour, Vec2(x, y - 1));
+//	}
+//}
+
+bool checkPixelProcessed(Vec2& n) 
+{
+	for (int i = 0; i < points.size(); i++) 
+	{
+		if (points.at(i).Equals(n)) {
+			std::cout << "ALREADY PROCESSED PIXEL FOUND!!" << std::endl;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void fill(SDL_Surface *s, SDL_Renderer * renderer, Vec2 pos, unsigned int newColour, unsigned int oldColour)
+{
+	points.clear();
+	std::queue<Vec2> q;
+	
+	if (newColour == oldColour)
+	{
+		return;
+	}
+	
+	q.push(pos);
+	while (!q.empty())
+	{
+		Vec2 n = q.front();
+		q.pop();
+	
+		
+		if (getpixel(s, n.x, n.y) == oldColour && (!checkPixelProcessed(Vec2(n.x, n.y))))
+		{
+			//std::cout << getpixel(s, n.x, n.y) << std::endl;
+			points.push_back(n);
+
+			if (!checkPixelProcessed(Vec2(n.x + 1, n.y)) )
+			{
+				q.push(Vec2(n.x + 1, n.y));
+			}
+			if (!checkPixelProcessed(Vec2(n.x - 1, n.y)) )
+			{
+				q.push(Vec2(n.x - 1, n.y));
+			}
+			if (!checkPixelProcessed(Vec2(n.x, n.y + 1)) )
+			{
+				q.push(Vec2(n.x, n.y+1));
+			}
+			if (!checkPixelProcessed(Vec2(n.x, n.y - 1)) )
+			{
+				q.push(Vec2(n.x, n.y-1));
+			}
+		}
+		else {
+			//std::cout << "FOUND NON ORIG COLOR PIXEL!!!" << std::endl;
+		}
+	}
+
 }

@@ -18,6 +18,8 @@ struct Vec2
   const Vec2& operator -= (Vec2 b);
   const Vec2& operator *= (float b);
   const Vec2& operator /= (float b);
+
+  const bool Equals(Vec2& other);
 }; 
 
 /// performs the dot product between two vectors
@@ -148,3 +150,9 @@ inline const Vec2& Vec2::operator /= (float b)
   return *this;
 }
 
+inline const bool Vec2::Equals(Vec2& other) {
+	if (x == other.x && y == other.y)
+		return true;
+
+	return false;
+}
