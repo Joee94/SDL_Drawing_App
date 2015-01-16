@@ -137,3 +137,8 @@ uint8_t Shape::GetA()
 {
    return (this->a);
 }
+
+std::vector<Vec2> Shape::getPoints()
+{
+   return points;
+}

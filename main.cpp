@@ -76,7 +76,6 @@ int main(int argc, char *argv[])
 
 	//My std::vectors, may remove and try and put everything in one Shapes Vector but I'll get to that....
 	std::vector<Shape*> shapes;
-	std::vector<Fill*> filledpolys;
 	std::string dropped_filedir;                  // Pointer for directory of dropped file
 
 	//There MUST be a better way to do this.... I'm just tired
@@ -234,10 +233,11 @@ int main(int argc, char *argv[])
 				   case 11:
 					  //Finally discovered how to access a pixels fill colour, credit to http://sdl.5483.n7.nabble.com/Getting-pixel-color-value-at-x-y-from-an-SDL-Surface-td20671.html
 					  // for the function and to http://www.gamedev.net/topic/291015-cannot-convert-from-uint32-to-sdl_color/ for converting from a Uint32 to a colour
+                  SDL_GetRendererOutputSize(renderer, &winWidth, &winHeight);
 					  sshot = SDL_CreateRGBSurface(0, winWidth, winHeight, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
 					  SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
-                 filledpolys.push_back(new Fill(sshot, renderer, Vec2((int)incomingEvent.button.x, (int)incomingEvent.button.y)));
-                 filledpolys.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
+                 shapes.push_back(new Fill(sshot, renderer, Vec2((int)incomingEvent.button.x, (int)incomingEvent.button.y)));
+                 shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
 					  break;
 					}
 				}
@@ -390,16 +390,6 @@ int main(int argc, char *argv[])
 			for (int i = 0; i < shapes.size(); ++i)
 			{
 				shapes[i]->Draw(renderer, ColourValue(shapes[i]->GetR()), ColourValue(shapes[i]->GetG()), ColourValue(shapes[i]->GetB()), ColourValue(shapes[i]->GetA()));
-			}
-		}
-
-		if (!filledpolys.empty())
-		{
-			for (int i = 0; i < filledpolys.size(); ++i)
-			{
-				filledpolys[i]->Draw(renderer, ColourValue(filledpolys[i]->GetR()), ColourValue(filledpolys[i]->GetG()), ColourValue(filledpolys[i]->GetB()), ColourValue(filledpolys[i]->GetA()));
-				
-				//std::cout << "x: " << points[i].x << "  y: " << points[i].y<<std::endl;
 			}
 		}
 
@@ -577,23 +567,15 @@ void SaveFile(std::vector<Shape*> shapes)
 						shapes[i]->GetB(),
 						shapes[i]->GetA());
 				}
-				else
+            else if (shapes[i]->GetShapeType() == 6)
 				{
-					//saving Cubic curves
-					fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\t%i\n",
-						shapes[i]->GetShapeType(),
-						shapes[i]->GetPoint1().x,
-						shapes[i]->GetPoint1().y,
-						shapes[i]->GetPoint2().x,
-						shapes[i]->GetPoint2().y,
-						shapes[i]->GetControlPoint().x,
-						shapes[i]->GetControlPoint().y,
-						shapes[i]->GetControlPoint2().x,
-						shapes[i]->GetControlPoint2().y,
-						shapes[i]->GetR(),
-						shapes[i]->GetG(),
-						shapes[i]->GetB(),
-						shapes[i]->GetA());
+              //std::vector<Vec2> test;
+              //test = shapes[i]->getPoints();
+              //
+              //std::ofstream f(filename);
+              //for (std::vector<float>::const_iterator i = test.begin()->x; i != test.end()->x; ++i) {
+              //   f << *i << '\n';
+             //}
 				}
 			}
 		}
@@ -606,50 +588,3 @@ float ColourValue(uint8_t v)
 	v *= 2;
 	return v;
 }
-
-
-//void fill(SDL_Surface *s, SDL_Renderer * renderer, Vec2 pos, unsigned int newColour, unsigned int oldColour)
-//{
-//	points.clear();
-//	std::queue<Vec2> q;
-//	
-//	if (newColour == oldColour)
-//	{
-//		return;
-//	}
-//	
-//	q.push(pos);
-//	while (!q.empty())
-//	{
-//		Vec2 n = q.front();
-//		q.pop();
-//	
-//		
-//		if (getpixel(s, n.x, n.y) == oldColour && (!checkPixelProcessed(Vec2(n.x, n.y))))
-//		{
-//			//std::cout << getpixel(s, n.x, n.y) << std::endl;
-//			points.push_back(n);
-//
-//			if (!checkPixelProcessed(Vec2(n.x + 1, n.y)) )
-//			{
-//				q.push(Vec2(n.x + 1, n.y));
-//			}
-//			if (!checkPixelProcessed(Vec2(n.x - 1, n.y)) )
-//			{
-//				q.push(Vec2(n.x - 1, n.y));
-//			}
-//			if (!checkPixelProcessed(Vec2(n.x, n.y + 1)) )
-//			{
-//				q.push(Vec2(n.x, n.y+1));
-//			}
-//			if (!checkPixelProcessed(Vec2(n.x, n.y - 1)) )
-//			{
-//				q.push(Vec2(n.x, n.y-1));
-//			}
-//		}
-//		else {
-//			//std::cout << "FOUND NON ORIG COLOR PIXEL!!!" << std::endl;
-//		}
-//	}
-//
-//}

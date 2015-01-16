@@ -28,6 +28,7 @@ public:
    uint8_t GetG();
    uint8_t GetB();
    uint8_t GetA();
+   std::vector<Vec2> getPoints();
 
 protected:
    Vec2* point1;  //My base 2 points which all shapes have however some may have more points
@@ -41,4 +42,5 @@ protected:
    uint8_t a;
 
    uint8_t shapeType;
+   std::vector<Vec2> points;
 };
