@@ -19,14 +19,14 @@ void Circle::Draw(SDL_Renderer* renderer, float r, float g, float b, float a)
 {
    //Ok I'm not 100% sure how this works, circles are complicated
 
-   float x0 = point1->x;  //assign my point1 co-ordinates to x0 and y0
-   float y0 = point1->y;
-   float radiusx = fabs(point2->x - point1->x);   //find the radius, for some reason length doesn't work or something... idk
-   float radiusy = fabs(point2->y - point1->y);   //I HATE this piece of code it's so terribly innefficient
+   int x0 = point1->x;  //assign my point1 co-ordinates to x0 and y0
+   int y0 = point1->y;
+   int radiusx = fabs(point2->x - point1->x);   //find the radius, for some reason length doesn't work or something... idk
+   int radiusy = fabs(point2->y - point1->y);   //I HATE this piece of code it's so terribly innefficient
    radius = sqrt((radiusx*radiusx) + (radiusy*radiusy));
    //radius = length(point1 - point2);    //Why doesn't this work.... WHYYY
-   float x = radius;   //set x as the radius
-   float y = 0;  //set y as the center point (I think)
+   int x = radius;   //set x as the radius
+   int y = 0;  //set y as the center point (I think)
    radiusError = 1 - x;
 
 #ifdef _DEBUG
@@ -39,7 +39,6 @@ void Circle::Draw(SDL_Renderer* renderer, float r, float g, float b, float a)
 #endif
 
    SDL_SetRenderDrawColor(renderer, r, g, b, a);
-
 
    for (y = 0; x >= y; y++)
    {

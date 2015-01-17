@@ -37,8 +37,6 @@ void CurvedLine::Draw(SDL_Renderer* renderer, float r, float g, float b, float a
 #endif
 
    SDL_SetRenderDrawColor(renderer, r, g, b, a);
-   //Parallel for loop learnt from rob
-#pragma omp parallel for
    for (int i = 1; i < numSamples; ++i)
    {
       //Once again, not sure how this works but it draws a pretty line

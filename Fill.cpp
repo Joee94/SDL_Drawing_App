@@ -2,6 +2,7 @@
 
 Fill::Fill(SDL_Surface *s, SDL_Renderer * renderer, Vec2 pos)
 {
+   point1 = new Vec2(pos);
    shapeType = 6;
    newColour = getpixel(s, 275, 25);
    oldColour = getpixel(s, pos.x, pos.y);
@@ -25,7 +26,7 @@ Fill::Fill(SDL_Surface *s, SDL_Renderer * renderer, Vec2 pos)
       switch (incomingEvent.type)   //Using the type for a case statement
       {
       case SDL_KEYDOWN:
-            //Selecting the tools
+         //Selecting the tools
          switch (incomingEvent.key.keysym.sym)
          {
             //Straight Line
@@ -36,32 +37,31 @@ Fill::Fill(SDL_Surface *s, SDL_Renderer * renderer, Vec2 pos)
          }
          break;
       }
-
-
-      if (getpixel(s, n.x, n.y) == oldColour && (!checkPixelProcessed(Vec2(n.x, n.y))) && n.x > 0 && n.x < winWidth && n.y > 0 && n.y < winHeight)
+      if (n.x >= 0 && n.x <= winWidth && n.y >= 0 && n.y <= winHeight)
       {
-         //std::cout << getpixel(s, n.x, n.y) << std::endl;
-         points.push_back(n);
 
-         if (!checkPixelProcessed(Vec2(n.x + 1, n.y)))
+         if (getpixel(s, n.x, n.y) == oldColour && (!checkPixelProcessed(Vec2(n.x, n.y))))
          {
-            q.push(Vec2(n.x + 1, n.y));
+            //std::cout << getpixel(s, n.x, n.y) << std::endl;
+            points.push_back(n);
+
+            if (!checkPixelProcessed(Vec2(n.x + 1, n.y)))
+            {
+               q.push(Vec2(n.x + 1, n.y));
+            }
+            if (!checkPixelProcessed(Vec2(n.x - 1, n.y)))
+            {
+               q.push(Vec2(n.x - 1, n.y));
+            }
+            if (!checkPixelProcessed(Vec2(n.x, n.y + 1)))
+            {
+               q.push(Vec2(n.x, n.y + 1));
+            }
+            if (!checkPixelProcessed(Vec2(n.x, n.y - 1)))
+            {
+               q.push(Vec2(n.x, n.y - 1));
+            }
          }
-         if (!checkPixelProcessed(Vec2(n.x - 1, n.y)))
-         {
-            q.push(Vec2(n.x - 1, n.y));
-         }
-         if (!checkPixelProcessed(Vec2(n.x, n.y + 1)))
-         {
-            q.push(Vec2(n.x, n.y + 1));
-         }
-         if (!checkPixelProcessed(Vec2(n.x, n.y - 1)))
-         {
-            q.push(Vec2(n.x, n.y - 1));
-         }
-      }
-      else {
-         //std::cout << "FOUND NON ORIG COLOR PIXEL!!!" << std::endl;
       }
    }
 }
@@ -74,9 +74,8 @@ Fill::~Fill()
 inline bool Fill::checkPixelProcessed(Vec2& n)
 {
    bool temp = false;
-   std::vector<Vec2>::iterator it = points.begin();
-   std::vector<Vec2>::iterator end = points.end();
-   #pragma omp parallel for
+   //doing a parallel for loop speeds things up ridiculously
+#pragma omp parallel for
    for (int i = 0; i < points.size(); ++i)
    {
       if (points[i] == n)
@@ -84,8 +83,7 @@ inline bool Fill::checkPixelProcessed(Vec2& n)
          temp = true;   //parallel for loops don't like returning.
       }
    }
-//doing a parallel for loop speeds things up ridiculously
-   
+
    if (temp == true)
       return true;
    return false;

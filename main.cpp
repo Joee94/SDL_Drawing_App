@@ -23,12 +23,6 @@
 #include "Fill.h"
 #include "Position.h"
 
-void LoadFile(std::vector<Shape*> &shapes, std::string filename);
-void SaveFile(std::vector<Shape*> shapes);
-float ColourValue(uint8_t v);
-void fill(SDL_Surface *s, SDL_Renderer * renderer, Vec2 pos, unsigned int newColour, unsigned int oldColour);
-bool checkPixelProcessed(Vec2& n);
-
 struct Colour
 {
    uint8_t  red = 0;
@@ -36,7 +30,13 @@ struct Colour
    uint8_t  blue = 0;
    uint8_t  alpha = 255;
 };
-SDL_Texture *t;
+
+void LoadFile(std::vector<Shape*> &shapes, std::string filename, SDL_Surface* s, SDL_Renderer* renderer);
+void SaveFile(std::vector<Shape*> shapes, Colour *bgColour);
+float ColourValue(uint8_t v);
+void fill(SDL_Surface *s, SDL_Renderer * renderer, Vec2 pos, unsigned int newColour, unsigned int oldColour);
+bool checkPixelProcessed(Vec2& n);
+inline unsigned int getpixel(SDL_Surface *s, int x, int y);
 
 int main(int argc, char *argv[])
 {
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
    uint8_t slider_r = 72;
    uint8_t slider_g = 72;
    uint8_t slider_b = 72;
-   uint8_t slider_a = 72;
+   uint8_t slider_a = 201;
 
    Vec2* slider_min_r = new Vec2(SLIDER_TL_X, SLIDER_TL_Y);
    Vec2* slider_max_r = new Vec2(SLIDER_BR_X, SLIDER_BR_Y);
@@ -114,6 +114,7 @@ int main(int argc, char *argv[])
    Transparent->LoadFromBMP("transparent.png", renderer);
 
    SDL_Surface *sshot;
+   SDL_Surface *s;
    //A selector to choose which tool to use
    int selector = 0;
    //The game loop
@@ -131,9 +132,10 @@ int main(int argc, char *argv[])
          case SDL_DROPFILE:
          {
             dropped_filedir = incomingEvent.drop.file;
-            //std::thread f(LoadFile, shapes, dropped_filedir);#
-            LoadFile(shapes, dropped_filedir);
-            //f.detach();
+            SDL_GetRendererOutputSize(renderer, &winWidth, &winHeight);
+            s = SDL_CreateRGBSurface(0, winWidth, winHeight, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+            SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, s->pixels, s->pitch);
+            LoadFile(shapes, dropped_filedir, s, renderer);
             break;
          }
          case SDL_MOUSEBUTTONDOWN:  //When the user presses the mouse button is will create a new object and add it to a vector
@@ -238,9 +240,9 @@ int main(int argc, char *argv[])
                   time_t now;
                   time(&now);
                   SDL_GetRendererOutputSize(renderer, &winWidth, &winHeight);
-                  sshot = SDL_CreateRGBSurface(0, winWidth, winHeight, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
-                  SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
-                  shapes.push_back(new Fill(sshot, renderer, Vec2((int)incomingEvent.button.x, (int)incomingEvent.button.y)));
+                  s = SDL_CreateRGBSurface(0, winWidth, winHeight, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+                  SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, s->pixels, s->pitch);
+                  shapes.push_back(new Fill(s, renderer, Vec2((int)incomingEvent.button.x, (int)incomingEvent.button.y)));
                   shapes.back()->Colour(colour->red, colour->green, colour->blue, colour->alpha);
                   time_t end;
                   time(&end);
@@ -305,6 +307,14 @@ int main(int argc, char *argv[])
                      shapes.back()->Point(incomingEvent, 2);
                      selector = 8;
                      break;
+                  case 12:
+                     //Corner 2 of triangle
+                     SDL_GetRendererOutputSize(renderer, &winWidth, &winHeight);
+                     s = SDL_CreateRGBSurface(0, winWidth, winHeight, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+                     SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, s->pixels, s->pitch);
+                     std::cout << getpixel(s, incomingEvent.button.x, incomingEvent.button.y) << std::endl;
+                     SDL_GetRGBA(getpixel(s, incomingEvent.button.x, incomingEvent.button.y), s->format, &colour->red, &colour->green, &colour->blue, &colour->alpha);
+                     break;
                   }
                }
             }
@@ -341,9 +351,13 @@ int main(int argc, char *argv[])
             case SDLK_7:
                selector = 11;
                break;
+               //Colour picker
+            case SDLK_8:
+               selector = 12;
+               break;
                //Save File
             case SDLK_s:
-               SaveFile(shapes);
+               SaveFile(shapes, bgCol);
                break;
                //Save Image
             case SDLK_p:
@@ -460,7 +474,7 @@ int main(int argc, char *argv[])
    return 0;
 }
 
-void LoadFile(std::vector<Shape*> &shapes, std::string filename)
+void LoadFile(std::vector<Shape*> &shapes, std::string filename, SDL_Surface* s, SDL_Renderer* renderer)
 {
 
    //Blech this wasn't fun
@@ -516,6 +530,13 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
          shapes.back()->Point(x0, y0, x1, y1, x2, y2);
          shapes.back()->Colour(r, g, b, a);
          break;
+      case 6:
+         shapes.push_back(new Fill(s,renderer,Vec2(x0,y0)));
+         shapes.back()->Colour(r, g, b, a);
+         break;
+      case 9:
+         SDL_SetRenderDrawColor(renderer, ColourValue(r), ColourValue(g), ColourValue(b), ColourValue(a));
+
       }
       types.push_back(type);  //add it to some types array for later
    }
@@ -525,7 +546,7 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename)
 
 }
 
-void SaveFile(std::vector<Shape*> shapes)
+void SaveFile(std::vector<Shape*> shapes, Colour *bgColour)
 {
    std::string filename = "savedata";
 
@@ -574,18 +595,46 @@ void SaveFile(std::vector<Shape*> shapes)
                   shapes[i]->GetB(),
                   shapes[i]->GetA());
             }
+            else if (shapes[i]->GetShapeType() == 4)
+            {
+               //Saving all the normal shapes
+               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\t%i\n",
+                  shapes[i]->GetShapeType(),
+                  shapes[i]->GetPoint1().x,
+                  shapes[i]->GetPoint1().y,
+                  shapes[i]->GetPoint2().x,
+                  shapes[i]->GetPoint2().y,
+                  shapes[i]->GetControlPoint().x,
+                  shapes[i]->GetControlPoint().y,
+                  shapes[i]->GetControlPoint2().x,
+                  shapes[i]->GetControlPoint2().y,
+                  shapes[i]->GetR(),
+                  shapes[i]->GetG(),
+                  shapes[i]->GetB(),
+                  shapes[i]->GetA());
+            }
             else if (shapes[i]->GetShapeType() == 6)
             {
-               //std::vector<Vec2> test;
-               //test = shapes[i]->getPoints();
-               //
-               //std::ofstream f(filename);
-               //for (std::vector<float>::const_iterator i = test.begin()->x; i != test.end()->x; ++i) {
-               //   f << *i << '\n';
-               //}
+               //Saving all the normal shapes
+               fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\t%i\n",
+                  shapes[i]->GetShapeType(),
+                  shapes[i]->GetPoint1().x,
+                  shapes[i]->GetPoint1().y,
+                  0.0f, 0.0f, 0.0f, 0.0f,0.0f,0.0f,
+                  shapes[i]->GetR(),
+                  shapes[i]->GetG(),
+                  shapes[i]->GetB(),
+                  shapes[i]->GetA());
             }
          }
       }
+      fprintf(f, "%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%i\t%i\t%i\n",
+         9,
+         0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+         bgColour->red,
+         bgColour->green,
+         bgColour->blue,
+         bgColour->alpha);
       fclose(f);
    }
 }
@@ -594,4 +643,9 @@ float ColourValue(uint8_t v)
 {
    v *= 2;
    return v;
+}
+
+inline unsigned int getpixel(SDL_Surface *s, int x, int y)
+{
+   return ((unsigned int*)s->pixels)[y*(s->pitch / sizeof(unsigned int)) + x];
 }
