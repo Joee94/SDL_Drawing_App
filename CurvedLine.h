@@ -16,5 +16,5 @@ public:
 
 private:
    //Some classic private variables
-	int numSamples = 100;
+   int numSamples = 100;
 };

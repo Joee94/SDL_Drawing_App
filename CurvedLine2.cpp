@@ -27,20 +27,20 @@ void CurvedLine2::Draw(SDL_Renderer* renderer, float r, float g, float b, float 
    float startX = point1->x;
    float startY = point1->y;
 
-   #ifdef _DEBUG  
-      //Lines to see where the control points are
-      SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
-      SDL_RenderDrawLine(renderer, (int)point1->x, (int)point1->y, (int)controlPoint->x, (int)controlPoint->y);
-      SDL_RenderDrawLine(renderer, (int)controlPoint->x, (int)controlPoint->y, (int)controlPoint2->x, (int)controlPoint2->y);
-      SDL_RenderDrawLine(renderer, (int)controlPoint2->x, (int)controlPoint2->y, (int)point2->x, (int)point2->y);
-      SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-      SDL_RenderDrawPoint(renderer, controlPoint->x, controlPoint->y);
-   #endif
+#ifdef _DEBUG  
+   //Lines to see where the control points are
+   SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+   SDL_RenderDrawLine(renderer, (int)point1->x, (int)point1->y, (int)controlPoint->x, (int)controlPoint->y);
+   SDL_RenderDrawLine(renderer, (int)controlPoint->x, (int)controlPoint->y, (int)controlPoint2->x, (int)controlPoint2->y);
+   SDL_RenderDrawLine(renderer, (int)controlPoint2->x, (int)controlPoint2->y, (int)point2->x, (int)point2->y);
+   SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+   SDL_RenderDrawPoint(renderer, controlPoint->x, controlPoint->y);
+#endif
 
 
    SDL_SetRenderDrawColor(renderer, r, g, b, a);
    //Parallel for loop learnt from rob
-   #pragma omp parallel for
+#pragma omp parallel for
    for (int i = 1; i < numSamples; ++i)
    {
       //Once again, not sure how this works but it draws a pretty line

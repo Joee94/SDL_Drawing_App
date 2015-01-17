@@ -3,7 +3,7 @@
 StraightLine::StraightLine()
 {
    //Create some points...
-	point1 = new Vec2();
+   point1 = new Vec2();
    point2 = new Vec2();
    shapeType = 0;
 }
@@ -11,8 +11,8 @@ StraightLine::StraightLine()
 StraightLine::~StraightLine()
 {
    //...Destroy some points
-	delete point1;
-	delete point2;
+   delete point1;
+   delete point2;
 }
 
 void StraightLine::Draw(SDL_Renderer* renderer, float r, float g, float b, float a)
@@ -31,5 +31,5 @@ void StraightLine::Draw(SDL_Renderer* renderer, float r, float g, float b, float
    //   y1 = point2->y + i * sin(angle + PI/2);
    //   SDL_RenderDrawLine(renderer, x0, y0, x1, y1);
    //}
-   SDL_RenderDrawLine(renderer, point1->x, point1->y, point2->x,point2->y);
+   SDL_RenderDrawLine(renderer, point1->x, point1->y, point2->x, point2->y);
 }

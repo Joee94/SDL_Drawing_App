@@ -3,9 +3,9 @@
 class Triangle : public Shape
 {
 public:
-	Triangle();
-	~Triangle();
+   Triangle();
+   ~Triangle();
 
-	void Draw(SDL_Renderer* renderer, float r, float g, float b, float a);
+   void Draw(SDL_Renderer* renderer, float r, float g, float b, float a);
 };
 
