@@ -70,10 +70,25 @@ int main(int argc, char *argv[])
    Sprite* CircleGUI = new Sprite;
    Sprite* CurvedGUI = new Sprite;
    Sprite* Curved2GUI = new Sprite;
+   Sprite* TriangleGUI = new Sprite;
+   Sprite* FillGUI = new Sprite;
+   Sprite* PickerGUI = new Sprite;
    Sprite* ColourPicker = new Sprite;
    Sprite* Slider = new Sprite;
    Sprite* Transparent = new Sprite;
    Position* pos = new Position;
+
+   LineGUI->LoadFromBMP("line.png", renderer);
+   RectangleGUI->LoadFromBMP("rectangle.png", renderer);
+   CircleGUI->LoadFromBMP("circle.png", renderer);
+   CurvedGUI->LoadFromBMP("curved.png", renderer);
+   Curved2GUI->LoadFromBMP("cubecurve.png", renderer);
+   TriangleGUI->LoadFromBMP("triangle.png", renderer);
+   FillGUI->LoadFromBMP("fill.png", renderer);
+   PickerGUI->LoadFromBMP("colourpicker.png", renderer);   //This colour picker naming stuff is confusing...
+   ColourPicker->LoadFromBMP("picker.png", renderer);
+   Slider->LoadFromBMP("slider.png", renderer);
+   Transparent->LoadFromBMP("transparent.png", renderer);
 
    //My std::vectors, may remove and try and put everything in one Shapes Vector but I'll get to that....
    std::vector<Shape*> shapes;
@@ -85,33 +100,13 @@ int main(int argc, char *argv[])
    uint8_t slider_b = 72;
    uint8_t slider_a = 201;
 
-   Vec2* slider_min_r = new Vec2(SLIDER_TL_X, SLIDER_TL_Y);
-   Vec2* slider_max_r = new Vec2(SLIDER_BR_X, SLIDER_BR_Y);
-
-   Vec2* slider_min_g = new Vec2(SLIDER_TL_X, SLIDER_TL_Y + 30);
-   Vec2* slider_max_g = new Vec2(SLIDER_BR_X, SLIDER_BR_Y + 30);
-
-   Vec2* slider_min_b = new Vec2(SLIDER_TL_X, SLIDER_TL_Y + 58);
-   Vec2* slider_max_b = new Vec2(SLIDER_BR_X, SLIDER_BR_Y + 58);
-
-   Vec2* slider_min_a = new Vec2(SLIDER_TL_X, SLIDER_TL_Y + 87);
-   Vec2* slider_max_a = new Vec2(SLIDER_BR_X, SLIDER_BR_Y + 87);
-
    Vec2* GUITopLeft = new Vec2(50.0f, 0);
    Vec2* GUIBottomRight = new Vec2(250.0f, 120.0f);
 
-   Vec2* toolPicker = new Vec2(50.0f, 250.0f);
+   Vec2* toolPicker = new Vec2(50.0f, 400.0f);
 
    //Loading the line by default until it's changed
 
-   LineGUI->LoadFromBMP("line.png", renderer);
-   RectangleGUI->LoadFromBMP("rectangle.png", renderer);
-   CircleGUI->LoadFromBMP("circle.png", renderer);
-   CurvedGUI->LoadFromBMP("curved.png", renderer);
-   Curved2GUI->LoadFromBMP("cubecurve.png", renderer);
-   ColourPicker->LoadFromBMP("picker.png", renderer);
-   Slider->LoadFromBMP("slider.png", renderer);
-   Transparent->LoadFromBMP("transparent.png", renderer);
 
    SDL_Surface *sshot;
    SDL_Surface *s;
@@ -148,22 +143,22 @@ int main(int argc, char *argv[])
             std::cout << incomingEvent.button.y << std::endl;
             if (pos->CheckPosition(incomingEvent, *GUITopLeft, *GUIBottomRight))
             {
-               if (pos->CheckPosition(incomingEvent, *slider_min_r, *slider_max_r))
+               if (pos->CheckPosition(incomingEvent, Vec2(SLIDER_TL_X, SLIDER_TL_Y), Vec2(SLIDER_BR_X, SLIDER_BR_Y)))
                {
                   slider_r = pos->GetPosition(incomingEvent).x - 5;
                   colour->red = slider_r - 72;
                }
-               else if (pos->CheckPosition(incomingEvent, *slider_min_g, *slider_max_g))
+               else if (pos->CheckPosition(incomingEvent, Vec2(SLIDER_TL_X, SLIDER_TL_Y + 30), Vec2(SLIDER_BR_X, SLIDER_BR_Y + 30)))
                {
                   slider_g = pos->GetPosition(incomingEvent).x - 5;
                   colour->green = slider_g - 72;
                }
-               else if (pos->CheckPosition(incomingEvent, *slider_min_b, *slider_max_b))
+               else if (pos->CheckPosition(incomingEvent, Vec2(SLIDER_TL_X, SLIDER_TL_Y + 58), Vec2(SLIDER_BR_X, SLIDER_BR_Y + 58)))
                {
                   slider_b = pos->GetPosition(incomingEvent).x - 5;
                   colour->blue = slider_b - 72;
                }
-               else if (pos->CheckPosition(incomingEvent, *slider_min_a, *slider_max_a))
+               else if (pos->CheckPosition(incomingEvent, Vec2(SLIDER_TL_X, SLIDER_TL_Y + 87), Vec2(SLIDER_BR_X, SLIDER_BR_Y + 87)))
                {
                   slider_a = pos->GetPosition(incomingEvent).x - 5;
                   colour->alpha = slider_a - 72;
@@ -196,6 +191,21 @@ int main(int argc, char *argv[])
                {
                   //Cubic Curve
                   selector = 5;
+               }
+               else if (pos->CheckPosition(incomingEvent, Vec2(0, 250), Vec2(50, 300)))
+               {
+                  //Triangle
+                  selector = 8;
+               }
+               else if (pos->CheckPosition(incomingEvent, Vec2(0, 300), Vec2(50, 350)))
+               {
+                  //Fill
+                  selector = 11;
+               }
+               else if (pos->CheckPosition(incomingEvent, Vec2(0, 350), Vec2(50, 400)))
+               {
+                  //Colour Picker
+                  selector = 12;
                }
             }
             //This is actually adding the shape to the array
@@ -308,7 +318,7 @@ int main(int argc, char *argv[])
                      selector = 8;
                      break;
                   case 12:
-                     //Corner 2 of triangle
+                     //Colour Picker
                      SDL_GetRendererOutputSize(renderer, &winWidth, &winHeight);
                      s = SDL_CreateRGBSurface(0, winWidth, winHeight, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
                      SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, s->pixels, s->pitch);
@@ -442,6 +452,18 @@ int main(int argc, char *argv[])
       case 7:
          Curved2GUI->Draw(0, 0, renderer);
          break;
+      case 8:
+      case 9:
+      case 10:
+         TriangleGUI->Draw(0, 0, renderer);
+         break;
+      case 11:
+         FillGUI->Draw(0, 0, renderer);
+         break;
+      case 12:
+         PickerGUI->Draw(0, 0, renderer);
+         break;
+
 
       }
       //std::cout << deltaTs <<std::endl;
