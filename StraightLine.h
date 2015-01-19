@@ -1,12 +1,13 @@
 #pragma once
 #include "Shape.h"
 
-//Inherit from Shape
+/// The Straight Line class
 class StraightLine : public Shape
 {
 public:
-   //Just a constructor, Destructor and a funtion
+   /// \brief Striaght Line constructor
    StraightLine();
+   /// \brief Striaght Line destructor
    ~StraightLine();
 
    void Draw(SDL_Renderer* renderer, float r, float g, float b, float a);

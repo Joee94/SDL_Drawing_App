@@ -2,44 +2,47 @@
 
 Fill::Fill(SDL_Surface *s, SDL_Renderer * renderer, Vec2 pos)
 {
-   point1 = new Vec2(pos);
-   shapeType = 6;
-   newColour = getpixel(s, 275, 25);
-   oldColour = getpixel(s, pos.x, pos.y);
-   std::queue<Vec2> q;
+   point1 = new Vec2(pos); //For loading purposes
+   shapeType = 6; //Loading/saving purposes
+   newColour = getpixel(s, 275, 25);   //The colour we would like it to be
+   oldColour = getpixel(s, pos.x, pos.y); //The colour we're looking to change
+   std::queue<Vec2> q;  //A queue to store all the pixels to check
    SDL_GetRendererOutputSize(renderer, &winWidth, &winHeight);
 
+   //If the new colour matches the old colour do nothing
    if (newColour == oldColour)
    {
       return;
    }
-
+   
+   //add the first position to the queue
    q.push(pos);
    SDL_Event incomingEvent;
    while (!q.empty())
    {
+      //set a Vec2 to the front of the queue
       Vec2 n = q.front();
+      //Remove that element from the queue
       q.pop();
-
 
       SDL_PollEvent(&incomingEvent);
       switch (incomingEvent.type)   //Using the type for a case statement
       {
       case SDL_KEYDOWN:
-         //Selecting the tools
+         //Incase it tries to fill the whole screen you can cancel it
          switch (incomingEvent.key.keysym.sym)
          {
-            //Straight Line
          case SDLK_u:
-            std::cout << "test";
             return;
             break;
          }
          break;
       }
+      //Adapted from http://en.wikipedia.org/wiki/Flood_fill
+      //First checking it's inside the window
       if (n.x >= 0 && n.x <= winWidth && n.y >= 0 && n.y <= winHeight)
       {
-
+         // Then checking if the pixel is the colour which needs to be replaces AND 
          if (getpixel(s, n.x, n.y) == oldColour && (!checkPixelProcessed(Vec2(n.x, n.y))))
          {
             //std::cout << getpixel(s, n.x, n.y) << std::endl;
@@ -75,7 +78,7 @@ inline bool Fill::checkPixelProcessed(Vec2& n)
 {
    bool temp = false;
    //doing a parallel for loop speeds things up ridiculously
-#pragma omp parallel for
+   #pragma omp parallel for
    for (int i = 0; i < points.size(); ++i)
    {
       if (points[i] == n)

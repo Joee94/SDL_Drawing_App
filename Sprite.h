@@ -5,7 +5,8 @@
 #include <SDL_image.h>
 #include <SDL.h>
 
-/// This class stores a texture image which you can draw where you want!
+/// \brief This class stores a texture image which you can draw where you want!
+/// \author Leigh Mcloughlin
 class Sprite
 {
 public:

@@ -42,8 +42,9 @@ void Circle::Draw(SDL_Renderer* renderer, float r, float g, float b, float a)
 
    for (y = 0; x >= y; y++)
    {
-      //Yeah I'm not gunna lie I'm not sure what's going on here... just drawing a buncha points
-      SDL_RenderDrawPoint(renderer, x + x0, y + y0);		//Completely and utterly stolen from http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+      //From what I understand this loop creates a section of the circle then mirrors it as many times as necessary
+      //Completely and utterly stolen from http://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+      SDL_RenderDrawPoint(renderer, x + x0, y + y0);		
       SDL_RenderDrawPoint(renderer, y + x0, x + y0);
       SDL_RenderDrawPoint(renderer, -x + x0, y + y0);
       SDL_RenderDrawPoint(renderer, -y + x0, x + y0);

@@ -1,14 +1,14 @@
 #pragma once
 #include "Shape.h"
 
-//Inherit from Shape
+/// The Rectangle class
 class Rectangle : public Shape
 {
 public:
-   //Constructor and Destructor... standard
+   /// \brief Rectangle constructor
    Rectangle();
+   /// \brief Rectangle destructor
    ~Rectangle();
 
-   //Just a draw function
    void Draw(SDL_Renderer* renderer, float r, float g, float b, float a);
 };

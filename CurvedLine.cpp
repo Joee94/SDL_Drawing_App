@@ -56,8 +56,8 @@ void CurvedLine::Draw(SDL_Renderer* renderer, float r, float g, float b, float a
    SDL_RenderDrawLine(renderer, startX, startY, point2->x, point2->y);
 }
 
+//Stolen from Leigh's code
 Vec2 CurvedLine::QuadBezierSample(Vec2 a, Vec2 b, Vec2 control, float t)
 {
-   //Magic...
    return ((1.0f - t)*(1.0f - t)*a) + (2.0f*(1.0f - t)*t*control) + (t*t*b);
 }

@@ -23,20 +23,24 @@
 #include "Fill.h"
 #include "Position.h"
 
+/// declares a type called 'Colour'
 struct Colour
 {
-   uint8_t  red = 0;
-   uint8_t  green = 0;
-   uint8_t  blue = 0;
-   uint8_t  alpha = 255;
+   uint8_t  red = 0;     ///< the red colour
+   uint8_t  green = 0;   ///< the green colour
+   uint8_t  blue = 0;    ///< the blue colour
+   uint8_t  alpha = 255; ///< the alpha value
 };
 
 void LoadFile(std::vector<Shape*> &shapes, std::string filename, SDL_Surface* s, SDL_Renderer* renderer);
-void SaveFile(std::vector<Shape*> shapes, Colour *bgColour);
+void SaveFile(std::vector<Shape*> shapes, Colour *bgColour, std::string file);
 float ColourValue(uint8_t v);
 void fill(SDL_Surface *s, SDL_Renderer * renderer, Vec2 pos, unsigned int newColour, unsigned int oldColour);
 bool checkPixelProcessed(Vec2& n);
 inline unsigned int getpixel(SDL_Surface *s, int x, int y);
+
+//I'm sorry for the global... I just could not get it to work without
+Colour *bgCol = new Colour;
 
 int main(int argc, char *argv[])
 {
@@ -62,7 +66,6 @@ int main(int argc, char *argv[])
    bool go = true;
 
    Colour *colour = new Colour;
-   Colour *bgCol = new Colour;
 
    //These could all really be on one sprite sheet... bleh maybe later
    Sprite* LineGUI = new Sprite;
@@ -92,7 +95,7 @@ int main(int argc, char *argv[])
 
    //My std::vectors, may remove and try and put everything in one Shapes Vector but I'll get to that....
    std::vector<Shape*> shapes;
-   std::string dropped_filedir;                  // Pointer for directory of dropped file
+   std::string dropped_filedir = "savedata.joe";                  // Pointer for directory of dropped file
 
    //There MUST be a better way to do this.... I'm just tired
    uint8_t slider_r = 72;
@@ -367,10 +370,11 @@ int main(int argc, char *argv[])
                break;
                //Save File
             case SDLK_s:
-               SaveFile(shapes, bgCol);
+               SaveFile(shapes, bgCol, dropped_filedir);
                break;
                //Save Image
             case SDLK_p:
+               //Code stolen from http://stackoverflow.com/questions/22315980/sdl2-c-taking-a-screenshot
                SDL_GetRendererOutputSize(renderer, &winWidth, &winHeight);
                sshot = SDL_CreateRGBSurface(0, winWidth, winHeight, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
                SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
@@ -496,6 +500,7 @@ int main(int argc, char *argv[])
    return 0;
 }
 
+/// \brief Loads a file
 void LoadFile(std::vector<Shape*> &shapes, std::string filename, SDL_Surface* s, SDL_Renderer* renderer)
 {
 
@@ -552,13 +557,12 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename, SDL_Surface* s,
          shapes.back()->Point(x0, y0, x1, y1, x2, y2);
          shapes.back()->Colour(r, g, b, a);
          break;
-      case 6:
-         shapes.push_back(new Fill(s,renderer,Vec2(x0,y0)));
-         shapes.back()->Colour(r, g, b, a);
-         break;
       case 9:
-         SDL_SetRenderDrawColor(renderer, ColourValue(r), ColourValue(g), ColourValue(b), ColourValue(a));
-
+		  bgCol->red = r;
+		  bgCol->green = g;
+		  bgCol->blue = b;
+		  bgCol->alpha = a;
+        break;
       }
       types.push_back(type);  //add it to some types array for later
    }
@@ -568,14 +572,16 @@ void LoadFile(std::vector<Shape*> &shapes, std::string filename, SDL_Surface* s,
 
 }
 
-void SaveFile(std::vector<Shape*> shapes, Colour *bgColour)
+/// \brief Saves all the shapesd background colour to file
+void SaveFile(std::vector<Shape*> shapes, Colour *bgColour, std::string file)
 {
-   std::string filename = "savedata";
+   //converting the string to a char so it can be accessed
+   char *cstr = &file[0];
 
    FILE *f;
    errno_t err;
 
-   if ((err = fopen_s(&f, "savedata.joe", "w")) != 0)
+   if ((err = fopen_s(&f, cstr, "w")) != 0)
    {
       std::cout << "Error, file not found";
    }
@@ -659,14 +665,17 @@ void SaveFile(std::vector<Shape*> shapes, Colour *bgColour)
          bgColour->alpha);
       fclose(f);
    }
+
 }
 
+/// \brief The colour isnt correct untli it is multiplied by 2
 float ColourValue(uint8_t v)
 {
    v *= 2;
    return v;
 }
 
+/// \brief gets the colour from a specific pixel
 inline unsigned int getpixel(SDL_Surface *s, int x, int y)
 {
    return ((unsigned int*)s->pixels)[y*(s->pitch / sizeof(unsigned int)) + x];

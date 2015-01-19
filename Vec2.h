@@ -1,7 +1,7 @@
 #pragma once
 #include <cmath>
-//This was stolen from rob -- sorry it just has everything
-/// declares a type called 'Vec2' that represents a 2D vector
+/// \brief declares a type called 'Vec2' that represents a 2D vector
+/// \author Rob Bateman
 struct Vec2
 {
    float x; ///< the X coordinate 
@@ -145,6 +145,7 @@ inline const Vec2& Vec2::operator *= (float b)
 }
 
 /// specifies the /= operator for Vec2
+/// \author Joe Reddie
 inline const Vec2& Vec2::operator /= (float b)
 {
    x /= b;
@@ -153,17 +154,10 @@ inline const Vec2& Vec2::operator /= (float b)
 }
 
 /// specifies the == operator for Vec2
+/// \author Joe Reddie
 inline const bool& Vec2::operator == (Vec2 b)
 {
    if (x == b.x && y == b.y)
-      return true;
-   return false;
-}
-
-/// specifies the == operator for Vec2
-inline const bool& Vec2::operator != (Vec2 b)
-{
-   if (x != b.x && y != b.y)
       return true;
    return false;
 }

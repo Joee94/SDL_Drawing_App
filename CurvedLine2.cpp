@@ -58,6 +58,7 @@ void CurvedLine2::Draw(SDL_Renderer* renderer, float r, float g, float b, float 
    SDL_RenderDrawLine(renderer, startX, startY, point2->x, point2->y);
 }
 
+//Stolen from Leigh's code + the algorithm from http://en.wikipedia.org/wiki/B%C3%A9zier_curve#Constructing_B.C3.A9zier_curves
 Vec2 CurvedLine2::CubicBezierSample(Vec2 a, Vec2 b, Vec2 control, Vec2 control2, float t)
 {
    //     (1-t^3)P0                              + 3(1-t)^2P1                             + 3(1-t)t^2P2                    + t^3P3

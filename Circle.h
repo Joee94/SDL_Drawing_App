@@ -1,18 +1,19 @@
 #pragma once
 #include "Shape.h"
 
-//Inherit from Shape
+/// The Circle class
 class Circle : public Shape
 {
 public:
-   //Just a constructor, Destructor and a funtion
+   /// \brief Circle constructor
    Circle();
+   /// \brief Circle destructor
    ~Circle();
 
    void Draw(SDL_Renderer* renderer, float r, float g, float b, float a);
 
 private:
    //some private variables for working things out
-   float radius;
-   float radiusError;
+   float radius;  ///<The circle radius
+   float radiusError;   ///<The circle error
 };

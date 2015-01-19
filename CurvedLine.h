@@ -1,20 +1,28 @@
 #pragma once
 #include "Shape.h"
 
-//Inherit from shape
+/// The Quadratic curve class
 class CurvedLine : public Shape
 {
 public:
-   //A bit more complicated
+   /// \brief Quadratic Curved line constructor
    CurvedLine();
+   /// \brief Quadratic Curved line destructor
    ~CurvedLine();
 
-   //All my functions are different this time
    void Draw(SDL_Renderer* renderer, float r, float g, float b, float a);
+
+   /// \brief Finds where the point should be drawn in relation to the control points
+   /// \param a The Starting Point
+   /// \param b The End Point
+   /// \param control The first Control point
+   /// \param t the number of points
    Vec2 QuadBezierSample(Vec2 a, Vec2 b, Vec2 control, float t);
+
+   /// \brief Returns the control point
    Vec2 GetControlPoint();
 
 private:
-   //Some classic private variables
+   /// \brief the number of points
    int numSamples = 100;
 };
